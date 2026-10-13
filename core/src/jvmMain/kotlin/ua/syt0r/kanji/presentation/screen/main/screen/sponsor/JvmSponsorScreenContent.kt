@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Coffee
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -30,17 +30,17 @@ object JvmSponsorScreenContent : SponsorScreenContract.Content {
             val uriHandler = LocalUriHandler.current
 
             Button(
-                onClick = { uriHandler.openUri("https://buymeacoffee.com/syt0r") },
+                onClick = { uriHandler.openUri("https://github.com/sponsors/RudrakshKashyap") },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFDD00),
-                    contentColor = Color(0xFF0D0C23)
+                    containerColor = Color(0xFF24292F),
+                    contentColor = Color.White
                 ),
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Outlined.Coffee, null)
+                Icon(Icons.Outlined.Favorite, null)
                 Spacer(Modifier.width(12.dp))
-                Text("Buy Me A Coffee")
+                Text("Sponsor on GitHub")
             }
 
         }

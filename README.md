@@ -33,7 +33,7 @@ Practice writing Japanese letters, learn their meanings and related words
 - Available modes to write words and pick correct letter readings
 - Works offline
 
-Repository with dictionary data and parsers here: [Kanji-Dojo-Data](https://github.com/syt0r/Kanji-Dojo-Data)
+Repository with dictionary data and parsers here: [Kanji-Dojo-Data](https://github.com/RudrakshKashyap/Kanji-Jojo-Data)
 
 ## Screenshots
 <p float="left">
@@ -50,7 +50,7 @@ Repository with dictionary data and parsers here: [Kanji-Dojo-Data](https://gith
 [![Play Store](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=ua.syt0r.kanji)
 [![F-Droid](https://img.shields.io/badge/F--Droid-1976D2?style=for-the-badge&logo=f-droid&logoColor=white)](https://f-droid.org/en/packages/ua.syt0r.kanji.fdroid/)
 
-1. Available in [F-Droid](https://f-droid.org/en/packages/ua.syt0r.kanji.fdroid/), the same version is published in [GitHub Releases](https://github.com/syt0r/Kanji-Dojo/releases/latest)
+1. Available in [F-Droid](https://f-droid.org/en/packages/ua.syt0r.kanji.fdroid/), the same version is published in [GitHub Releases](https://github.com/RudrakshKashyap/Kanji-Jojo/releases/latest)
 2. [Google Play](https://play.google.com/store/apps/details?id=ua.syt0r.kanji)
 
 ### iOS
@@ -59,15 +59,15 @@ Repository with dictionary data and parsers here: [Kanji-Dojo-Data](https://gith
 ### Desktop
 
 #### Windows
-- Download `.msi` installer from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases)
+- Download `.msi` installer from [Github Releases](https://github.com/RudrakshKashyap/Kanji-Jojo/releases)
 #### Mac
-1. Download `.dmg` installer from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases) for your platform
+1. Download `.dmg` installer from [Github Releases](https://github.com/RudrakshKashyap/Kanji-Jojo/releases) for your platform
    - `Kanji Jojo-arm-*.dmg` for Apple Silicon
    - `Kanji Jojo-intel-*.dmg` for devices with older Intel CPU
 2. Install the app
    - Go to `Privacy & Security` screen in system settings and click on `Open Anyway` button under security section for `Kanji Jojo.app`
 #### Linux
-- Download `.AppImage` executable from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases)
+- Download `.AppImage` executable from [Github Releases](https://github.com/RudrakshKashyap/Kanji-Jojo/releases)
 
 ## Version comparison
 | Google Play                                                                         | F-Droid | Desktop |

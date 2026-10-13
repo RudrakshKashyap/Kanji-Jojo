@@ -34,10 +34,10 @@
   
   <content_rating type="oars-1.1" />
   
-  <url type="homepage">https://github.com/syt0r/Kanji-Dojo</url>
-  <url type="bugtracker">https://github.com/syt0r/Kanji-Dojo/issues</url>
-  <url type="donation">https://buymeacoffee.com/syt0r</url>
-  <url type="vcs-browser">https://github.com/syt0r/Kanji-Dojo</url>
+  <url type="homepage">https://github.com/RudrakshKashyap/Kanji-Jojo</url>
+  <url type="bugtracker">https://github.com/RudrakshKashyap/Kanji-Jojo/issues</url>
+  <url type="donation">https://github.com/sponsors/RudrakshKashyap</url>
+  <url type="vcs-browser">https://github.com/RudrakshKashyap/Kanji-Jojo</url>
   
   <screenshots>
     <screenshot type="default">

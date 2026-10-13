@@ -39,12 +39,12 @@ fun KanjiBackground(
 
         /***
          * Drawing rectangles instead of line with path effect for backward compatibility
-         * Issue: https://github.com/syt0r/Kanji-Dojo/issues/12
+         * Issue: https://github.com/RudrakshKashyap/Kanji-Jojo/issues/12
          */
 
         /***
          * Drawing rectangles instead of line with path effect for backward compatibility
-         * Issue: https://github.com/syt0r/Kanji-Dojo/issues/12
+         * Issue: https://github.com/RudrakshKashyap/Kanji-Jojo/issues/12
          */
         drawDottedLineWithRectangles(
             Orientation.Vertical,

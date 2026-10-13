@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
  * Drawing path without scale using android-specific matrix transformations
  * There are issues with hardware acceleration on older Android versions when drawing on scaled
  * canvas using compose API
- * Details: https://github.com/syt0r/Kanji-Dojo/issues/12
+ * Details: https://github.com/RudrakshKashyap/Kanji-Jojo/issues/12
  */
 
 actual fun DrawScope.drawKanjiStroke(
