@@ -60,7 +60,7 @@
      id="layer1"
      style="display:inline">
     <rect
-       style="display:inline;opacity:1;fill:#ff5555;fill-opacity:1;stroke:none;stroke-width:0.132292;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#4A90E2;fill-opacity:1;stroke:none;stroke-width:0.132292;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-opacity:1"
        id="rect43609"
        width="28.574999"
        height="28.575001"
@@ -69,7 +69,7 @@
        inkscape:label="dark background"
        sodipodi:insensitive="true" />
     <rect
-       style="display:inline;opacity:1;fill:#ff8080;fill-opacity:1;stroke:none;stroke-width:0.132553;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#7EB6FF;fill-opacity:1;stroke:none;stroke-width:0.132553;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-opacity:1"
        id="rect46958"
        width="48.364452"
        height="31.820639"
@@ -90,7 +90,7 @@
        inkscape:label="foreground"
        sodipodi:nodetypes="cccccccccccccccccssscccccccccccccccccccccc" />
     <ellipse
-       style="display:inline;opacity:1;fill:#ff5555;fill-opacity:1;stroke:#ff8080;stroke-width:0.449792;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-dasharray:none;stroke-opacity:1"
+       style="display:inline;opacity:1;fill:#4A90E2;fill-opacity:1;stroke:#7EB6FF;stroke-width:0.449792;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:500;stroke-dasharray:none;stroke-opacity:1"
        id="path71038"
        cx="19.300114"
        cy="18.328176"

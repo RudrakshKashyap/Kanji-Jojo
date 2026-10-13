@@ -328,7 +328,7 @@ object EnglishFeedbackStrings : FeedbackStrings {
 
 object EnglishSponsorStrings : SponsorStrings {
     override val message: String = """
-        Development of Kanji Dojo started in 2021 by a single person and it remains free for all users who want to learn Japanese
+        Development of Kanji Jojo started as a community fork of Kanji Dojo and it remains free for all users who want to learn Japanese
         
         If you find the app useful please consider supporting this project financially, every contribution counts
         

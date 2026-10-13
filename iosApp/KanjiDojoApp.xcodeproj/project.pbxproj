@@ -392,7 +392,7 @@
 					"$(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = KanjiDojoApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kanji Dojo";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kanji Jojo";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -425,7 +425,7 @@
 					"$(SRCROOT)/../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				INFOPLIST_FILE = KanjiDojoApp/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kanji Dojo";
+				INFOPLIST_KEY_CFBundleDisplayName = "Kanji Jojo";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.3;
 				LD_RUNPATH_SEARCH_PATHS = (

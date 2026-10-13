@@ -4,7 +4,7 @@
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-only</project_license>
   
-  <name>Kanji Dojo</name>
+  <name>Kanji Jojo</name>
   <summary>Japanese language learning app with writing exercises, flashcards and built-in dictionary</summary>
   <developer id="ua.syt0r">
     <name>syt0r</name>
@@ -64,7 +64,7 @@
       <description>
         <ul>
           <li>Updated installers for Windows and Linux, now it's not required to have Java installed</li>
-          <li>Renamed executable for MacOS, please manually delete the old `kanji-dojo` app, tha app name is `Kanji Dojo` now</li>
+          <li>Renamed executable for MacOS, please manually delete the old `kanji-dojo` app, tha app name is `Kanji Jojo` now</li>
           <li>Fixed a sync issue with incorrectly applied timestamp after downloading data from the cloud</li>
         </ul>
       </description>

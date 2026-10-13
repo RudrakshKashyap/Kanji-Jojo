@@ -93,7 +93,7 @@ enum class SocialButton(
     val icon: DrawableResource
 ) {
     Discord(
-        url = "https://discord.gg/2Ny6h6pXTY",
+        url = "https://discord.gg/ptAJzGnHYk",
         title = Res.string.social_discord,
         icon = Res.drawable.discord
     ),

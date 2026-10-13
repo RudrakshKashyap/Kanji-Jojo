@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Kanji Dojo
+Name=Kanji Jojo
 Comment=Application for practicing writing and reading Japanese characters
 Exec=kanji-dojo
 Icon=${SNAP}/meta/gui/icon.png

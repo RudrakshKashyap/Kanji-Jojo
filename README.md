@@ -1,11 +1,13 @@
 <div align="center">
 
-  <img src="preview_assets//inkscape_icon.svg" height=120 style="border-radius: 20px;">
+  <img src="preview_assets/inkscape_icon.svg" height=120 style="border-radius: 20px;">
 
-  # Kanji Dojo
-  ![Version Badge](https://img.shields.io/badge/version-v2.2.1-blue?style=for-the-badge&labelColor=ffffff&color=ff5555)
+  # Kanji Jojo
+  ![Version Badge](https://img.shields.io/badge/version-v2.2.1-blue?style=for-the-badge&labelColor=ffffff&color=4A90E2)
 
 </div>
+
+> **Notice**: Kanji Jojo is a community continuation (fork) of the original "Kanji Dojo" project. The original repository was archived by its author, and the official Discord server was made read-only. To keep this amazing open-source project alive, we have forked it under the same GNU GPL v3.0 license. We welcome contributions and aim to continue development! Join our new community on [Discord](https://discord.gg/ptAJzGnHYk).
 
 ## Table of Contents
 - [About this app](#about-this-app)
@@ -60,10 +62,10 @@ Repository with dictionary data and parsers here: [Kanji-Dojo-Data](https://gith
 - Download `.msi` installer from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases)
 #### Mac
 1. Download `.dmg` installer from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases) for your platform
-   - `Kanji Dojo-arm-*.dmg` for Apple Silicon
-   - `Kanji Dojo-intel-*.dmg` for devices with older Intel CPU
+   - `Kanji Jojo-arm-*.dmg` for Apple Silicon
+   - `Kanji Jojo-intel-*.dmg` for devices with older Intel CPU
 2. Install the app
-   - Go to `Privacy & Security` screen in system settings and click on `Open Anyway` button under security section for `Kanji Dojo.app`
+   - Go to `Privacy & Security` screen in system settings and click on `Open Anyway` button under security section for `Kanji Jojo.app`
 #### Linux
 - Download `.AppImage` executable from [Github Releases](https://github.com/syt0r/Kanji-Dojo/releases)
 
