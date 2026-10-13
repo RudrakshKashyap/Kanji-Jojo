@@ -40,7 +40,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
-            packageName = "Kanji Dojo"
+            packageName = "Kanji Jojo"
             packageVersion = AppVersion.desktopAppVersion
             vendor = "syt0r"
 

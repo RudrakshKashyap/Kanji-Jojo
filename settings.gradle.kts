@@ -25,5 +25,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "kanji-dojo"
+rootProject.name = "kanji-jojo"
 include(":app", ":iosApp", ":desktopApp", ":core", ":mediaGenerator")

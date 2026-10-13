@@ -124,7 +124,7 @@ sqldelight {
 }
 
 android {
-    namespace = "ua.syt0r.kanji.core"
+    namespace = "ua.syt0r.kanjijojo.core"
 
     compileSdk = 35
     defaultConfig {

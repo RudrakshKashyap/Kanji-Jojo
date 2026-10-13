@@ -13,7 +13,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import ua.syt0r.kanji.AndroidMainBuildConfig
 import ua.syt0r.kanji.core.AndroidThemeManager
-import ua.syt0r.kanji.core.BuildConfig
+import ua.syt0r.kanjijojo.core.BuildConfig
 import ua.syt0r.kanji.core.app_data.AppDataDatabaseProvider
 import ua.syt0r.kanji.core.app_data.AndroidAppDataDatabaseProvider
 import ua.syt0r.kanji.core.backup.AndroidBackupArchiveHandler
