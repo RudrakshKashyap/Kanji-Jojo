@@ -17,11 +17,11 @@ kotlin {
 
 android {
 
-    namespace = "ua.syt0r.kanjijojo"
+    namespace = "com.rudraksh.kanjijojo"
 
     compileSdk = 36
     defaultConfig {
-        applicationId = "ua.syt0r.kanjijojo"
+        applicationId = "com.rudraksh.kanjijojo"
         minSdk = 26
         targetSdk = 36
         versionCode = AppVersion.versionCode

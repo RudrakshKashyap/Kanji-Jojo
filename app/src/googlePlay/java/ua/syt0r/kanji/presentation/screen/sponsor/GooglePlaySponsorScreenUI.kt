@@ -55,7 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import ua.syt0r.kanjijojo.R
+import com.rudraksh.kanjijojo.R
 import ua.syt0r.kanji.core.app_data.data.buildFuriganaString
 import ua.syt0r.kanji.core.billing.DonationOffer
 import ua.syt0r.kanji.presentation.common.theme.neutralColors
