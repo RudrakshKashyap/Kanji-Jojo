@@ -28,4 +28,4 @@ chmod +x ./appimagetool-x86_64.AppImage
 chmod +x AppDir/AppRun
 
 ./appimagetool-x86_64.AppImage AppDir/
-chmod +x Kanji_Dojo-x86_64.AppImage
+chmod +x Kanji_Jojo-x86_64.AppImage
