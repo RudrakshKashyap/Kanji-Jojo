@@ -16,3 +16,8 @@ Bundle-wide and cross-cutting changes. Newest first.
 - **Adoption**: Adopted [/okf-SPEC.md](/okf-SPEC.md) and [/llm-wiki.md](/llm-wiki.md)
   as first-class `Reference` concepts (added OKF frontmatter) so the whole
   `okf/` tree is conformant.
+- **Agent discovery**: Added a repo-root `AGENTS.md` with the required OKF
+  reading order and maintenance triggers, plus thin `CLAUDE.md` and `GEMINI.md`
+  pointers. Added a prominent README entry and updated the
+  [Operating Manual](/AGENTS.md) and [index](/index.md) to distinguish the
+  repository guide from the bundle manual and clarify bundle-relative links.

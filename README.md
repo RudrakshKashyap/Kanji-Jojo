@@ -9,7 +9,22 @@
 
 > **Notice**: Kanji Jojo is a community continuation (fork) of the original "Kanji Dojo" project. The original repository was archived by its author, and the official Discord server was made read-only. To keep this amazing open-source project alive, we have forked it under the same GNU GPL v3.0 license. We welcome contributions and aim to continue development! Join our new community on [Discord](https://discord.gg/ptAJzGnHYk).
 
+## For contributors and AI coding agents
+
+Start with **[AGENTS.md](AGENTS.md)**, the shared repository guide, then read
+the **[OKF operating manual](okf/AGENTS.md)** and **[knowledge index](okf/index.md)**
+before exploring code or answering project questions. The [`okf/`](okf/)
+knowledge base records architecture, module responsibilities, the data layer,
+build setup, and the SRS engine, with space for feature knowledge, conventions,
+and playbooks. The guide explains when and how to keep it current.
+
+Agent entry files are `AGENTS.md` for Codex, `CLAUDE.md` for Claude, and
+`GEMINI.md` for Gemini. The latter two point to the shared guide so instructions
+stay in one place. For other agents, or a session opened outside this repository,
+explicitly ask the agent to read this repository's `AGENTS.md` first.
+
 ## Table of Contents
+- [For contributors and AI coding agents](#for-contributors-and-ai-coding-agents)
 - [About this app](#about-this-app)
 - [Screenshots](#screenshots)
 - [Downloads and Installation](#downloads)

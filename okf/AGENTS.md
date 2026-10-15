@@ -22,6 +22,19 @@ It combines two ideas:
 This bundle **dogfoods OKF**: the format's own spec and the wiki pattern live
 inside the bundle as `Reference` concepts.
 
+## Repository entry points
+
+The repo-root [AGENTS.md](../AGENTS.md) is the shared guide for all agents.
+Repo-root [CLAUDE.md](../CLAUDE.md) and [GEMINI.md](../GEMINI.md) point to it,
+and the [README](../README.md) advertises the same reading order. That guide
+requires agents to read this manual and [/index.md](/index.md) before project
+questions or code work and summarizes the update triggers in section 6.1.
+Keep repo-wide guidance in that root guide and detailed bundle rules here.
+
+The `../` links above leave the bundle for repository files. Links beginning
+with `/` elsewhere in this manual are bundle-relative: `/AGENTS.md` means
+this operating manual, not the repo-root guide.
+
 ---
 
 ## 1. What this bundle is for

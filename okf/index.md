@@ -4,7 +4,8 @@ okf_version: "0.2"
 
 # Start here
 
-- [Operating Manual (AGENTS.md)](/AGENTS.md) - how to read, write, and maintain this bundle. Read first.
+- [Repository agent guide](../AGENTS.md) - repo-wide entry point, also reached through repo-root `CLAUDE.md` and `GEMINI.md`. Read before this bundle's manual and index.
+- [Operating Manual (AGENTS.md)](/AGENTS.md) - how to read, write, and maintain this bundle. Read after the repository guide, before the concepts below.
 - [Change log](/log.md) - chronological history of the bundle.
 
 # Architecture
