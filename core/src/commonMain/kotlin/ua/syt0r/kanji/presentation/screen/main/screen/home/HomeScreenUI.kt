@@ -208,7 +208,8 @@ private fun SyncButton(
     ) {
 
         IconButton(
-            onClick = onClick
+            onClick = onClick,
+            enabled = !state.value.loading
         ) {
 
             val loadingState = remember { derivedStateOf { state.value.loading } }

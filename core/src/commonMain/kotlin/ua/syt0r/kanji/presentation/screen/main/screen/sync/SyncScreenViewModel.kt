@@ -43,7 +43,8 @@ class SyncScreenViewModel(
     override fun sync() {
         when (val syncState = syncManager.state.value) {
             is SyncFeatureState.Enabled -> syncState.sync()
-            else -> error("Unexpected state")
+            // Account state can change between rendering and receiving a tap.
+            else -> Unit
         }
     }
 

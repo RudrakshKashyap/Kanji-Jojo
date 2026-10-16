@@ -1,11 +1,13 @@
 package ua.syt0r.kanji.core.sync
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -85,7 +87,7 @@ class DefaultSyncManager(
 
 }
 
-private class SyncEnabledState(
+internal class SyncEnabledState(
     private val coroutineScope: CoroutineScope,
     private val handleSyncIntentUseCase: HandleSyncIntentUseCase,
     private val accountManager: AccountManager,
@@ -98,7 +100,8 @@ private class SyncEnabledState(
     )
 
     private val intentJobChannel = Channel<IntentData>(
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        capacity = Channel.UNLIMITED,
+        onUndeliveredElement = { it.result?.cancel() }
     )
 
     private val _state = MutableStateFlow<SyncState>(
@@ -107,20 +110,38 @@ private class SyncEnabledState(
     override val state: StateFlow<SyncState> = _state
 
     init {
+        coroutineScope.coroutineContext[Job]?.invokeOnCompletion {
+            intentJobChannel.cancel()
+        }
         coroutineScope.launch {
-            intentJobChannel.consumeAsFlow().collectLatest {
-                val last = handleSyncIntentUseCase(coroutineScope, it.intent)
-                    .onEach { syncState ->
-                        syncState.updateAppState()
-                        _state.value = syncState
+            intentJobChannel.consumeAsFlow().collectLatest { request ->
+                try {
+                    // Trackers belong to this operation. A failure is caught
+                    // here instead of cancelling the long-lived intent worker.
+                    coroutineScope {
+                        val last = handleSyncIntentUseCase(this, request.intent)
+                            .onEach { syncState ->
+                                _state.value = syncState
+                                syncState.updateAppState()
+                            }
+                            .last()
+                        request.result?.complete(last)
+                        // Keep current change trackers alive until replaced.
+                        awaitCancellation()
                     }
-                    .last()
-
-                it.result?.complete(last)
+                } catch (error: CancellationException) {
+                    request.result?.cancel(error)
+                    throw error
+                } catch (error: Throwable) {
+                    val failed = SyncState.Error.Api(ApiRequestIssue.classify(error))
+                    _state.value = failed
+                    request.result?.complete(failed)
+                    failed.updateAppState()
+                }
             }
         }
         if (initialStateIssue == null) {
-            coroutineScope.launch { intentJobChannel.send(IntentData(SyncIntent.Refresh)) }
+            intentJobChannel.trySend(IntentData(SyncIntent.Refresh))
         }
     }
 
@@ -139,7 +160,9 @@ private class SyncEnabledState(
 
     private fun handleIntent(intent: SyncIntent): CompletableDeferred<SyncState> {
         val completableDeferred = CompletableDeferred<SyncState>()
-        coroutineScope.launch { intentJobChannel.send(IntentData(intent, completableDeferred)) }
+        if (intentJobChannel.trySend(IntentData(intent, completableDeferred)).isFailure) {
+            completableDeferred.cancel()
+        }
         return completableDeferred
     }
 

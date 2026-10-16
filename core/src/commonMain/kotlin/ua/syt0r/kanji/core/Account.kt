@@ -61,6 +61,7 @@ fun Module.addAccountDefinitions() {
             coroutineScope = CoroutineScope(Dispatchers.IO),
             appPreferences = get(),
             networkApi = get(),
+            networkClients = get(),
             browserAccountAuth = BrowserAccountAuth(get()),
             timeUtils = get()
         )
@@ -72,6 +73,7 @@ class DefaultAccountManager(
     private val coroutineScope: CoroutineScope,
     private val appPreferences: PreferencesContract.AppPreferences,
     private val networkApi: NetworkApi,
+    private val networkClients: NetworkClients,
     private val browserAccountAuth: BrowserAccountAuth,
     private val timeUtils: TimeUtils
 ) : AccountManager {
@@ -90,9 +92,7 @@ class DefaultAccountManager(
     override fun signIn(refreshToken: String, idToken: String) {
         _state.value = AccountState.Loading
         coroutineScope.launch {
-            appPreferences.refreshToken.set(refreshToken)
-            appPreferences.idToken.set(idToken)
-            appPreferences.lastSyncedDataInfo.set(null)
+            storeSession(refreshToken, idToken)
             updateStateFromRemote()
         }
     }
@@ -105,9 +105,7 @@ class DefaultAccountManager(
                 val tokens = browserAccountAuth.signIn(desktop) { url ->
                     withContext(Dispatchers.Main) { openBrowser(url) }
                 }
-                appPreferences.refreshToken.set(tokens.refreshToken)
-                appPreferences.idToken.set(tokens.idToken)
-                appPreferences.lastSyncedDataInfo.set(null)
+                storeSession(tokens.refreshToken, tokens.idToken)
                 updateStateFromRemote()
             } catch (error: TimeoutCancellationException) {
                 _state.value = AccountState.Error(ApiRequestIssue.Other(
@@ -200,12 +198,23 @@ class DefaultAccountManager(
         subscriptionDue = subscriptionDue
     )
 
+    private suspend fun storeSession(refreshToken: String, idToken: String) {
+        appPreferences.refreshToken.set(refreshToken)
+        appPreferences.idToken.set(idToken)
+        // Preference observers run asynchronously. The immediate profile lookup
+        // must use this session even if those observers have not run yet.
+        networkClients.invalidateTokens()
+        appPreferences.userInfo.set(null)
+        appPreferences.lastSyncedDataInfo.set(null)
+    }
+
     private suspend fun clearUserData() {
         appPreferences.apply {
             refreshToken.set(null)
             idToken.set(null)
             userInfo.set(null)
         }
+        networkClients.invalidateTokens()
     }
 
 }

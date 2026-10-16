@@ -29,13 +29,26 @@ Android/JVM use SecureRandom and MessageDigest; iOS uses Security/CoreCrypto.
 Neither verifier nor Firebase credentials enter a URL or app log.
 
 The user signs in on the owned website and explicitly approves app access.
+On mobile, Continue approves the grant and attempts to open the fixed app
+return link in one action; a Return link remains if the browser blocks opening.
+Returning only resumes the app and does not authorize anything. Android may
+pause background polling while the browser is open.
 The website records a short-lived grant. The app polls
 `POST /api/auth/device/token` with its verifier/state every two seconds, for up
-to five minutes. Pending approval is HTTP 202. A valid grant can be consumed
+to five minutes. Temporary connection failures, HTTP 408/429, and server errors
+are retried within that same deadline; permanent errors still require restarting
+sign-in. Unauthenticated calls have a 30-second request timeout; authenticated
+sync calls have a 60-second timeout, with 10-second connection and 30-second
+socket timeouts. Pending approval is HTTP 202. A valid grant can be consumed
 only once, within two minutes of approval. The backend returns a Firebase custom
 token; the app exchanges it at Firebase Auth REST's `signInWithCustomToken`
 endpoint for its own ID/refresh tokens. Refresh uses the owned project's Secure
 Token endpoint, form-encoded requests, and persists rotated refresh tokens.
+Changes to either the ID or refresh token invalidate the client's cached bearer
+credentials, including a re-sign-in that reuses the refresh token.
+Account sign-in and sign-out also clear the bearer cache explicitly, so an
+immediate profile lookup cannot race the asynchronous preference observers.
+New credentials clear the previous user's cached profile before that lookup.
 
 This is an open app-specific approval/polling protocol, not a claim to implement
 the standard OAuth device grant. It replaces the inherited refresh-token-in-URL
@@ -92,3 +105,20 @@ E2EE or old-service migration is implemented. Integration testing requires the
 companion backend, private Storage, rules/IAM, real archives, and disposable
 accounts. Kotlin JVM protocol tests use Ktor MockEngine. iOS needs a macOS/Xcode
 compile and device sign-in check; Linux cannot validate that target.
+
+# Sync operation lifecycle and recovery
+
+Each enabled account owns an intent worker. An operation and its live data
+trackers share a child scope: replacing/cancelling it stops old trackers and
+settles any waiting result. A thrown refresh, backup, cleanup, or tracker error
+is reported as a retryable sync error without cancelling the worker. Queued
+requests are cancelled when their account scope ends; no result is silently
+dropped. The UI blocks repeated taps during refresh/upload/download, and ignores
+a tap that races with an account-state transition. From the home screen, a sync
+error or conflict opens the sync screen to expose retry and resolution controls.
+
+JVM regression tests cover thrown refresh/upload errors, cancellation and retry,
+tracker cleanup/failure, network polling retries, permanent rejection, and the
+overall sign-in deadline, and cached bearer replacement on sign-in/sign-out.
+Real device/browser and cloud validation remain
+necessary; tests do not authenticate a live account or restore real study data.

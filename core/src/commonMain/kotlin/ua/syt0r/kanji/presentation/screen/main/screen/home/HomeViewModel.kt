@@ -53,7 +53,16 @@ class HomeViewModel(
             is SyncFeatureState.Error -> return false
 
             is SyncFeatureState.Enabled -> {
-                syncState.sync()
+                when (syncState.state.value) {
+                    is SyncState.Error,
+                    is SyncState.Conflict -> return false
+
+                    SyncState.Refreshing,
+                    SyncState.Uploading,
+                    SyncState.Downloading -> return true
+
+                    else -> syncState.sync()
+                }
                 return true
             }
         }

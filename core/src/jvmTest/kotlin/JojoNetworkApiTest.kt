@@ -8,6 +8,8 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.util.hex
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -17,6 +19,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.test.assertFailsWith
 
 class JojoNetworkApiTest {
     private fun clients(engine: MockEngine) = object : NetworkClients {
@@ -123,5 +126,51 @@ class JojoNetworkApiTest {
         }
         assertEquals("test-refresh", tokens.refreshToken)
         assertEquals("test-id", tokens.idToken)
+    }
+
+    @Test
+    fun browserApprovalSurvivesTemporaryNetworkAndServerFailures() = runBlocking {
+        var polls = 0
+        var verifier: String? = null
+        val engine = MockEngine { request ->
+            if (request.url.host == "kanji-jojo.com") {
+                val body = Json.parseToJsonElement((request.body as OutgoingContent.ByteArrayContent).bytes().decodeToString()).jsonObject
+                val current = body.getValue("verifier").jsonPrimitive.content
+                if (verifier != null) assertEquals(verifier, current)
+                verifier = current
+                when (++polls) {
+                    1 -> throw IOException("temporary connection loss")
+                    2 -> respond("unavailable", HttpStatusCode.ServiceUnavailable)
+                    3 -> respond("rate limited", HttpStatusCode.TooManyRequests)
+                    4 -> respond("pending", HttpStatusCode.Accepted)
+                    else -> respond("""{"customToken":"custom"}""", HttpStatusCode.OK)
+                }
+            } else respond("""{"refreshToken":"refresh","idToken":"id"}""", HttpStatusCode.OK)
+        }
+        val tokens = BrowserAccountAuth(clients(engine), pollIntervalMillis = 1).signIn(false) {}
+        assertEquals("id", tokens.idToken)
+        assertEquals(5, polls)
+    }
+
+    @Test
+    fun browserApprovalStopsOnPermanentRejectionAndDoesNotContactFirebase() = runBlocking {
+        var calls = 0
+        val engine = MockEngine { request ->
+            calls++
+            assertEquals("kanji-jojo.com", request.url.host)
+            respond("expired", HttpStatusCode.Gone)
+        }
+        assertFailsWith<IllegalStateException> {
+            BrowserAccountAuth(clients(engine), pollIntervalMillis = 1).signIn(false) {}
+        }
+        assertEquals(1, calls)
+    }
+
+    @Test
+    fun browserApprovalNetworkRetriesKeepTheOverallTimeout() = runBlocking<Unit> {
+        val engine = MockEngine { throw IOException("offline") }
+        assertFailsWith<TimeoutCancellationException> {
+            BrowserAccountAuth(clients(engine), pollIntervalMillis = 1, signInTimeoutMillis = 50).signIn(false) {}
+        }
     }
 }

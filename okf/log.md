@@ -4,6 +4,14 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-16
 
+- Isolated sync operation and tracker errors so later requests remain usable;
+  settled interrupted results, removed dropped intents, and disabled overlapping
+  sync taps. Added bounded network timeouts, transient app-sign-in polling
+  retries, and bearer-cache invalidation for either changed credential. Added
+  JVM regression coverage for recovery, cancellation, trackers, and polling.
+  Account changes clear cached bearer credentials before profile requests; home
+  sync errors open the detailed controls instead of silently retrying.
+  The companion website now approves and attempts mobile return with one click.
 - Corrected debug APK signing to use the Android debug key even when a release
   keystore exists, so local builds do not require release signing credentials.
 - Migrated active website/account/sync requests to the owned Kanji Jojo origin

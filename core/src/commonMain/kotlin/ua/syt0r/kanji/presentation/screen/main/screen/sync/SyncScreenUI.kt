@@ -139,6 +139,9 @@ fun SyncScreenUI(
 
                 InvertedButton(
                     onClick = sync,
+                    enabled = syncState != SyncState.Refreshing &&
+                            syncState != SyncState.Uploading &&
+                            syncState != SyncState.Downloading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(strings.syncButton)

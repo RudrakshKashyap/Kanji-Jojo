@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.authProvider
 import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -17,6 +18,7 @@ import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -56,14 +58,19 @@ class DefaultNetworkClients(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Unconfined)
 
-    init {
-        appPreferences.refreshToken.onModified
-            .onEach { invalidateTokens() }
-            .launchIn(coroutineScope)
+    override val unauthenticatedClient: HttpClient = HttpClient(engineFactory) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 30_000
+            connectTimeoutMillis = 10_000
+            socketTimeoutMillis = 30_000
+        }
     }
-
-    override val unauthenticatedClient: HttpClient = HttpClient(engineFactory)
     override val authenticatedClient: HttpClient = HttpClient(engineFactory) {
+        install(HttpTimeout) {
+            requestTimeoutMillis = 60_000
+            connectTimeoutMillis = 10_000
+            socketTimeoutMillis = 30_000
+        }
         install(Auth) {
             bearer {
                 sendWithoutRequest { it.url.host == "kanji-jojo.com" && it.url.protocol.name == "https" }
@@ -71,6 +78,14 @@ class DefaultNetworkClients(
                 refreshTokens(::tokenRefreshHandler)
             }
         }
+    }
+
+    init {
+        // Either credential can change on sign-in or refresh. Invalidate only
+        // after the clients exist, including when the refresh token is reused.
+        merge(appPreferences.refreshToken.onModified, appPreferences.idToken.onModified)
+            .onEach { invalidateTokens() }
+            .launchIn(coroutineScope)
     }
 
     override fun invalidateTokens() {

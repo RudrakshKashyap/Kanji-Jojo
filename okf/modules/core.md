@@ -97,6 +97,13 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 Account and sync protocol ownership, browser approval, preference migration,
 and unsupported legacy services are documented in
 [owned accounts and snapshot sync](/features/accounts-and-sync.md).
+The enabled sync worker isolates operation/tracker failures and settles cancelled
+requests, preserving retries. Browser sign-in retries transient polling failures
+within a fixed deadline; network calls have bounded timeouts. Shared
+`InvertedButton` accepts an enabled state so in-flight sync cannot be repeatedly
+interrupted by taps.
+Account credential changes explicitly invalidate the network bearer cache before
+loading the new profile; asynchronous preference observers alone are insufficient.
 
 See [Multiplatform overview](/architecture/multiplatform.md) for how source sets
 map to targets.
