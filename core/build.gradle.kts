@@ -92,6 +92,11 @@ kotlin {
                 implementation(libs.ktor.server.netty)
             }
         }
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.ktor.client.mock)
+            }
+        }
         iosMain {
             dependencies {
                 implementation(libs.sqldelight.native.sqlite.driver)

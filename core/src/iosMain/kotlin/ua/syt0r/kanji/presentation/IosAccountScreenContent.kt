@@ -59,9 +59,6 @@ object IosAccountScreenContent : AccountScreenContract.Content {
         val viewModel = getMultiplatformViewModel<IosAccountScreenViewModel>()
         val uriHandler = LocalUriHandler.current
 
-        LaunchedEffect(Unit) {
-            if (data != null) viewModel.signIn(data)
-        }
 
         val viewController = LocalUIViewController.current
 
@@ -69,19 +66,18 @@ object IosAccountScreenContent : AccountScreenContract.Content {
             state = viewModel.state.collectAsState(),
             onUpClick = { state.navigateBack() },
             signIn = {
-                val authURL = NSURL(string = AccountScreenContract.DEEP_LINK_AUTH_URL)
+                viewModel.signIn { browserUrl ->
+                val authURL = NSURL(string = browserUrl)
                 val session = ASWebAuthenticationSession(
                     uRL = authURL,
-                    callbackURLScheme = "kanji-dojo",
+                    callbackURLScheme = "kanji-jojo",
                 ) { url, error ->
-                    Logger.d("authCallback url[$url] error[$error]")
-                    url?.absoluteString
-                        ?.let { AccountScreenContract.parseDeepLink(it) }
-                        ?.let { viewModel.signIn(it) }
+                    Logger.d("App browser sign-in returned")
                 }
                 val authViewController = ViewControllerPresentationContextProvider(viewController)
                 session.presentationContextProvider = authViewController
                 session.start()
+                }
             },
             signOut = { viewModel.signOut() },
             refresh = { viewModel.refresh() },
@@ -89,9 +85,9 @@ object IosAccountScreenContent : AccountScreenContract.Content {
                 val authURL = NSURL(string = ACCOUNT_WEB_PAGE_URL)
                 val session = ASWebAuthenticationSession(
                     uRL = authURL,
-                    callbackURLScheme = "kanji-dojo",
+                    callbackURLScheme = "kanji-jojo",
                 ) { url, error ->
-                    Logger.d("deleteAccount url[$url] error[$error]")
+                    Logger.d("Account management browser returned")
                 }
                 val authViewController = ViewControllerPresentationContextProvider(viewController)
                 session.presentationContextProvider = authViewController
@@ -101,9 +97,9 @@ object IosAccountScreenContent : AccountScreenContract.Content {
                 val authURL = NSURL(string = ACCOUNT_DELETE_URL)
                 val session = ASWebAuthenticationSession(
                     uRL = authURL,
-                    callbackURLScheme = "kanji-dojo",
+                    callbackURLScheme = "kanji-jojo",
                 ) { url, error ->
-                    Logger.d("deleteAccount url[$url] error[$error]")
+                    Logger.d("Account management browser returned")
                 }
                 val authViewController = ViewControllerPresentationContextProvider(viewController)
                 session.presentationContextProvider = authViewController
@@ -215,8 +211,8 @@ class IosAccountScreenViewModel(
 
     }
 
-    fun signIn(data: AccountScreenContract.ScreenData) {
-        accountManager.signIn(data.refreshToken, data.idToken)
+    fun signIn(openBrowser: (String) -> Unit) {
+        accountManager.signInWithBrowser(openBrowser)
     }
 
     fun signOut() {

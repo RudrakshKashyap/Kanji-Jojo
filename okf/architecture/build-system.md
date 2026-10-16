@@ -32,10 +32,16 @@ Debug builds additionally get `.dev` appended to the application ID and
 
 ## Signing
 
-All build types use a `signedBuild` signing config that reads from
-`keystore.jks` at the project root. Keystore credentials come from environment
+The owned Google Play Firebase config must include the debug package
+`com.rudraksh.kanjijojo.dev` to compile that variant. F-Droid does not run Google
+Services processing. Account/sync tests in `core`'s JVM test source set use a
+test-only Ktor MockEngine dependency; production dependencies are unchanged.
+
+Debug builds always use the Android debug signing key. Release builds use a
+`signedBuild` signing config that reads from `keystore.jks` at the project root.
+Keystore credentials come from environment
 variables: `KEYSTORE_PASS`, `SIGN_KEY`, `SIGN_PASS`. If `keystore.jks` does not
-exist, falls back to the `debug` signing config.
+exist, release retains the inherited fallback to the `debug` signing config.
 
 The CI pipeline decodes the keystore from a base64 secret (`KEYSTORE`) before
 building.

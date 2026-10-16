@@ -1,7 +1,6 @@
 package ua.syt0r.kanji.presentation.screen.main.screen.account
 
 import androidx.compose.runtime.Composable
-import io.ktor.http.Url
 import kotlinx.serialization.Serializable
 import ua.syt0r.kanji.presentation.screen.main.MainNavigationState
 
@@ -9,28 +8,19 @@ interface AccountScreenContract {
 
     companion object {
 
-        const val ACCOUNT_WEB_PAGE_URL = "https://kanji-dojo.com/account"
+        const val ACCOUNT_WEB_PAGE_URL = "https://kanji-jojo.com/account"
         const val ACCOUNT_DELETE_URL = "$ACCOUNT_WEB_PAGE_URL?delete=true"
-        const val DEEP_LINK_AUTH_URL = "$ACCOUNT_WEB_PAGE_URL?deepLinkAuth=true"
-        const val DEEP_LINK_AUTH_REDIRECT_URL = "kanji-dojo://signin"
+        const val DEEP_LINK_AUTH_REDIRECT_URL = "kanji-jojo://signin"
 
-        fun serverAuthUrl(port: Int): String = "$ACCOUNT_WEB_PAGE_URL?callbackPort=$port"
-
-        fun parseDeepLink(url: String): ScreenData? {
-            return Url(url).parameters.run {
-                ScreenData(
-                    refreshToken = get("refreshToken") ?: return@run null,
-                    idToken = get("idToken") ?: return@run null
-                )
-            }
-        }
+        // The redirect only resumes the UI. Authentication is exchanged by
+        // the pending app process using its private proof over HTTPS.
+        fun parseDeepLink(url: String): ScreenData? = if (
+            url == DEEP_LINK_AUTH_REDIRECT_URL || url == "$DEEP_LINK_AUTH_REDIRECT_URL/"
+        ) ScreenData() else null
     }
 
     @Serializable
-    data class ScreenData(
-        val refreshToken: String,
-        val idToken: String
-    )
+    data class ScreenData(val browserReturn: Boolean = true)
 
     interface Content {
 

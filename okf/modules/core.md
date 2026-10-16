@@ -94,6 +94,10 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 
 ## Platform source sets
 
+Account and sync protocol ownership, browser approval, preference migration,
+and unsupported legacy services are documented in
+[owned accounts and snapshot sync](/features/accounts-and-sync.md).
+
 See [Multiplatform overview](/architecture/multiplatform.md) for how source sets
 map to targets.
 

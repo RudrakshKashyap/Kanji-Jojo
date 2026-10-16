@@ -49,8 +49,8 @@ class GooglePlayAccountScreenViewModel(
 
     }
 
-    override fun signIn(data: AccountScreenContract.ScreenData) {
-        accountManager.signIn(data.refreshToken, data.idToken)
+    override fun startSignIn(openBrowser: (String) -> Unit) {
+        accountManager.signInWithBrowser(openBrowser)
     }
 
     override fun signOut() {
@@ -70,15 +70,9 @@ class GooglePlayAccountScreenViewModel(
                     email = email,
                     subscriptionInfo = subscriptionInfo,
                     issue = issue,
-                    subscriptionSectionState = when {
-                        subscriptionInfo is SubscriptionInfo.Active -> {
-                            SubscriptionSectionState.Hidden
-                        }
-
-                        else -> SubscriptionSectionState.Shown(
-                            content = createSubscriptionSectionContentState(this)
-                        )
-                    }
+                    // The owned service has no billing backend; never offer a
+                    // purchase whose entitlement cannot be provisioned.
+                    subscriptionSectionState = SubscriptionSectionState.Hidden
                 )
                 send(screenState)
             }

@@ -9,7 +9,7 @@ import ua.syt0r.kanji.presentation.screen.main.MainNavigationState
 import ua.syt0r.kanji.presentation.screen.main.screen.deck_picker.data.DeckPickerScreenConfiguration
 
 
-private const val DownloadsUrl = "https://kanji-dojo.com/"
+private const val DownloadsUrl = "https://kanji-jojo.com/"
 
 @Composable
 fun GeneralDashboardScreen(

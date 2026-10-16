@@ -15,7 +15,7 @@ import ua.syt0r.kanji.core.user_data.preferences.PreferencesContract
 import ua.syt0r.kanji.presentation.common.json
 
 interface ApplyRemoteSyncDataUseCase {
-    suspend operator fun invoke(): ApplySyncResult
+    suspend operator fun invoke(revision: Long): ApplySyncResult
 }
 
 sealed interface ApplySyncResult {
@@ -31,25 +31,16 @@ class DefaultApplyRemoteSyncDataUseCase(
     private val backupManager: BackupManager
 ) : ApplyRemoteSyncDataUseCase {
 
-    override suspend fun invoke(): ApplySyncResult {
+    override suspend fun invoke(revision: Long): ApplySyncResult {
         Logger.logMethod()
 
         val syncBackupFile = syncBackupFileProvider()
 
-        val result = networkApi.getSyncData().mapCatching {
-            val channel = it.value
+        val result = networkApi.getSyncData(revision).mapCatching {
+            val channel = it.value.channel
             appPreferences.subscriptionAlert.set(it.alert)
 
-            val jsonLength = channel.readInt()
-            Logger.d("jsonLength[$jsonLength]")
-            val jsonLengthBytes = channel.readShort().toInt()
-            Logger.d("jsonLengthBytes[$jsonLengthBytes]")
-
-            val infoJson = channel.readByteArray(jsonLengthBytes).decodeToString()
-            Logger.d("infoJson[$infoJson]")
-
-            val syncDataInfo = json.decodeFromString<ApiSyncDataInfo>(infoJson)
-                .toPreferencesType()
+            val syncDataInfo = it.value.info.toPreferencesType()
 
             platformFileHandler.write(syncBackupFile, channel)
 

@@ -34,17 +34,17 @@ class DeepLinkHandler(
                         if (data != null) {
                             MainDestination.Account(data)
                         } else {
-                            Logger.d("Couldn't parse deep link $it")
+                            Logger.d("Unrecognized app return link")
                             null
                         }
                     }
 
                     else -> {
-                        Logger.d("Unsupported deeplink[$it]")
+                        Logger.d("Unsupported deep link")
                         null
                     }
                 }
-                Logger.d("Navigating from deep link to destination[$it]")
+                Logger.d("Handling app return navigation")
                 destination?.let { navigationState.navigateToTop(it) }
             }
         }

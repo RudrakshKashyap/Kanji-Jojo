@@ -11,7 +11,7 @@ import ua.syt0r.kanji.core.toApiType
 import ua.syt0r.kanji.core.user_data.preferences.PreferencesContract
 
 interface UploadSyncDataUseCase {
-    suspend operator fun invoke(): UploadSyncDataResult
+    suspend operator fun invoke(baseRevision: Long): UploadSyncDataResult
 }
 
 sealed interface UploadSyncDataResult {
@@ -28,7 +28,7 @@ class DefaultUploadSyncDataUseCase(
     private val backupManager: BackupManager
 ) : UploadSyncDataUseCase {
 
-    override suspend fun invoke(): UploadSyncDataResult {
+    override suspend fun invoke(baseRevision: Long): UploadSyncDataResult {
         Logger.logMethod()
         val backupFile = syncBackupFileProvider()
         return runCatching {
@@ -36,6 +36,7 @@ class DefaultUploadSyncDataUseCase(
             backupManager.backupTo(backupFile)
             networkApi.updateSyncData(
                 syncDataInfo = localSyncDataInfo.toApiType(),
+                baseRevision = baseRevision,
                 channelProvider = ChannelProvider { platformFileHandler.read(backupFile) }
             )
                 .mapCatching { appPreferences.subscriptionAlert.set(it.alert) }

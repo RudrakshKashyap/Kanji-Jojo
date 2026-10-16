@@ -20,21 +20,21 @@ class AppPreferences(
 
     override val refreshToken: SuspendedProperty<String?> = createNullableProperty(
         type = StringSuspendedPropertyType,
-        key = "refresh_token",
+        key = "jojo_v1_refresh_token",
         initialValue = { null },
         enableBackup = false
     )
 
     override val idToken: SuspendedProperty<String?> = createNullableProperty(
         type = StringSuspendedPropertyType,
-        key = "id_token",
+        key = "jojo_v1_id_token",
         initialValue = { null },
         enableBackup = false
     )
 
     override val userInfo: SuspendedProperty<PreferencesUserInfo?> = createNullableProperty(
         type = jsonPojoSuspendedPropertyType(),
-        key = "user_info",
+        key = "jojo_v1_user_info",
         enableBackup = false,
         initialValue = { null }
     )
@@ -63,7 +63,7 @@ class AppPreferences(
     override val lastSyncedDataInfo: SuspendedProperty<PreferencesSyncDataInfo?> =
         createNullableProperty(
             type = jsonPojoSuspendedPropertyType(),
-            key = "last_synced_data_info_json",
+            key = "jojo_v1_last_synced_data_info_json",
             initialValue = { null },
             enableBackup = false
         )

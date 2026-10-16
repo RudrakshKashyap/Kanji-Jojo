@@ -137,7 +137,7 @@ fun AccountScreenSignedIn(
     refresh: () -> Unit,
     signOut: () -> Unit,
     signIn: () -> Unit,
-    showSubscriptionInfo: Boolean = true,
+    showSubscriptionInfo: Boolean = false,
     openAccountWeb: (uriHandler: UriHandler) -> Unit = { it.openUri(ACCOUNT_WEB_PAGE_URL) },
     deleteAccount: (uriHandler: UriHandler) -> Unit = { it.openUri(ACCOUNT_DELETE_URL) },
     extraContent: @Composable (ColumnScope.() -> Unit)? = null

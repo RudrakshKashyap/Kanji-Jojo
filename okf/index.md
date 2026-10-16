@@ -26,6 +26,7 @@ okf_version: "0.2"
 
 # Features
 
+- [Owned accounts and snapshot sync](/features/accounts-and-sync.md) - Firebase browser approval and private versioned backup migration.
 - [features/](/features/) - per-feature concepts, only for features carrying non-obvious knowledge (high bar - see [Operating Manual section 6.1](/AGENTS.md)).
 
 # Playbooks

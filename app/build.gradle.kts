@@ -73,7 +73,7 @@ android {
     val debugSigningConfig = signingConfigs.getByName("debug")
 
     buildTypes.forEach {
-        it.signingConfig = if (keystoreFile.exists()) {
+        it.signingConfig = if (it.name != "debug" && keystoreFile.exists()) {
             signedBuildSigningConfig
         } else {
             debugSigningConfig

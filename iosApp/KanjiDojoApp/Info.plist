@@ -29,7 +29,7 @@
 			<string>ua.syt0r.kanji</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kanji-dojo</string>
+				<string>kanji-jojo</string>
 			</array>
 		</dict>
 		<dict/>

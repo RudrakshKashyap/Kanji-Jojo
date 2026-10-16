@@ -1,27 +1,28 @@
 package ua.syt0r.kanji.core
 
 import io.ktor.client.request.forms.ChannelProvider
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
-import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.util.hex
 import io.ktor.util.network.UnresolvedAddressException
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readRemaining
+import kotlinx.io.readByteArray
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import ua.syt0r.kanji.core.logger.Logger
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import ua.syt0r.kanji.core.user_data.preferences.PreferencesSyncDataInfo
 
 interface NetworkApi {
@@ -30,9 +31,10 @@ interface NetworkApi {
     suspend fun getUserId(): Result<String>
 
     suspend fun getSyncDataInfo(): Result<SubscriptionResponse<ApiSyncDataInfo>>
-    suspend fun getSyncData(): Result<SubscriptionResponse<ByteReadChannel>>
+    suspend fun getSyncData(revision: Long): Result<SubscriptionResponse<RemoteSyncData>>
     suspend fun updateSyncData(
         syncDataInfo: ApiSyncDataInfo,
+        baseRevision: Long,
         channelProvider: ChannelProvider
     ): Result<SubscriptionResponse<Unit>>
 
@@ -94,7 +96,8 @@ data class ApiUserInfo(
 data class ApiSyncDataInfo(
     val dataId: String,
     val dataVersion: Long,
-    val dataTimestamp: Long? = null
+    val dataTimestamp: Long? = null,
+    val revision: Long = 0
 )
 
 @Serializable
@@ -132,167 +135,107 @@ data class ApiDonation(
     val amountJpy: Float
 )
 
+data class RemoteSyncData(val info: ApiSyncDataInfo, val channel: ByteReadChannel)
+
+@Serializable
+private data class JojoAccount(val uid: String, val email: String? = null)
+@Serializable
+private data class JojoCapabilities(val sync: Boolean = false)
+@Serializable
+private data class JojoAccountResponse(val account: JojoAccount, val capabilities: JojoCapabilities)
+@Serializable
+private data class JojoBackup(
+    val revision: Long,
+    val dataId: String,
+    val dataVersion: Long,
+    val dataTimestamp: Long? = null,
+    val byteSize: Int,
+    val sha256: String
+) {
+    fun toApiType() = ApiSyncDataInfo(dataId, dataVersion, dataTimestamp, revision)
+}
+@Serializable
+private data class JojoBackupResponse(val backup: JojoBackup?)
+
 class DefaultNetworkApi(
     private val networkClients: NetworkClients,
     private val json: Json
 ) : NetworkApi {
+    private suspend fun account(): JojoAccountResponse = json.decodeFromString(
+        checked { networkClients.authenticatedClient.get("${JojoService.api}/account") }.bodyAsText()
+    )
 
-    override suspend fun getUserInfo(): Result<ApiUserInfo> {
-        return safeRequest { networkClients.authenticatedClient.get(GET_USER_INFO_URL) }
-            .mapCatching { json.decodeFromString(it.bodyAsText()) }
+    override suspend fun getUserInfo(): Result<ApiUserInfo> = runCatching {
+        val result = account()
+        // The inherited subscription flag now represents free sync access,
+        // not a paid subscription or access to the old operator's services.
+        ApiUserInfo(result.account.email ?: "Kanji Jojo account", result.capabilities.sync)
     }
 
-    override suspend fun getUserId(): Result<String> {
-        return safeRequest { networkClients.authenticatedClient.get(GET_USER_ID_URL) }
-            .mapCatching { it.bodyAsText() }
+    override suspend fun getUserId(): Result<String> = runCatching { account().account.uid }
+
+    private suspend fun backup(): JojoBackup = json.decodeFromString<JojoBackupResponse>(
+        checked { networkClients.authenticatedClient.get("${JojoService.api}/v1/sync") }.bodyAsText()
+    ).backup ?: throw HttpResponseException(HttpStatusCode.NoContent, "No cloud backup")
+
+    override suspend fun getSyncDataInfo(): Result<SubscriptionResponse<ApiSyncDataInfo>> = runCatching {
+        SubscriptionResponse(backup().toApiType(), null)
     }
 
-    override suspend fun getSyncDataInfo(): Result<SubscriptionResponse<ApiSyncDataInfo>> {
-        return safeSubscriptionRequest(
-            request = { networkClients.authenticatedClient.get(GET_SYNC_INFO_URL) },
-            responseMapper = { json.decodeFromString<ApiSyncDataInfo>(it.bodyAsText()) }
-        )
+    override suspend fun getSyncData(revision: Long): Result<SubscriptionResponse<RemoteSyncData>> = runCatching {
+        val info = backup()
+        if (info.revision != revision) throw HttpResponseException(HttpStatusCode.Conflict, "The remote backup changed. Refresh sync and try again.")
+        val response = checked {
+            networkClients.authenticatedClient.get("${JojoService.api}/v1/sync/download") {
+                url { parameters.append("revision", revision.toString()) }
+            }
+        }
+        val bytes = response.bodyAsChannel().readRemaining(JojoService.maxBackupBytes.toLong() + 1).readByteArray()
+        check(bytes.size <= JojoService.maxBackupBytes && bytes.size == info.byteSize) { "Invalid backup size" }
+        check(hex(sha256(bytes)) == info.sha256) { "Backup checksum verification failed" }
+        SubscriptionResponse(RemoteSyncData(info.toApiType(), ByteReadChannel(bytes)), null)
     }
-
-    override suspend fun getSyncData(): Result<SubscriptionResponse<ByteReadChannel>> {
-        return safeSubscriptionRequest(
-            request = {
-                networkClients.authenticatedClient.get(GET_SYNC_URL)
-            },
-            responseMapper = { it.bodyAsChannel() }
-        )
-    }
-
 
     override suspend fun updateSyncData(
         syncDataInfo: ApiSyncDataInfo,
+        baseRevision: Long,
         channelProvider: ChannelProvider
-    ): Result<SubscriptionResponse<Unit>> = safeSubscriptionRequest(
-        request = {
-            val infoJson = json.encodeToString(syncDataInfo)
-            networkClients.authenticatedClient.post(UPDATE_SYNC_URL) {
-                val partDataList = formData {
-                    append("info", infoJson)
-                    append("data", channelProvider, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "filename=\"data.zip\"")
-                    })
-                }
-                setBody(MultiPartFormDataContent(partDataList))
+    ): Result<SubscriptionResponse<Unit>> = runCatching {
+        val bytes = channelProvider.block().readRemaining(JojoService.maxBackupBytes.toLong() + 1).readByteArray()
+        check(bytes.size <= JojoService.maxBackupBytes) { "Cloud backups must be 4 MB or smaller. Use local export for larger backups." }
+        checked {
+            networkClients.authenticatedClient.put("${JojoService.api}/v1/sync") {
+                contentType(ContentType.Application.Zip)
+                header(HttpHeaders.IfMatch, "\"$baseRevision\"")
+                header("X-Backup-Data-Id", syncDataInfo.dataId)
+                header("X-Backup-Data-Version", syncDataInfo.dataVersion.toString())
+                syncDataInfo.dataTimestamp?.let { header("X-Backup-Data-Timestamp", it.toString()) }
+                setBody(bytes)
             }
-        },
-        responseMapper = { Unit }
-    )
-
-    override suspend fun postFeedback(data: FeedbackApiData) = safeRequestUnit {
-        val requestBody = JsonObject(
-            mapOf(
-                "topic" to JsonPrimitive(data.topic),
-                "text" to JsonPrimitive(data.message),
-                "user" to data.userData
-            )
-        )
-
-        networkClients.unauthenticatedClient.post(FEEDBACK_URL) {
-            contentType(ContentType.Application.Json)
-            setBody(requestBody.toString())
         }
+        SubscriptionResponse(Unit, null)
     }
 
-    override suspend fun postDonationPurchase(data: DonationPurchaseApiData) = safeRequestUnit {
-        val requestBody = JsonObject(
-            mapOf(
-                "email" to JsonPrimitive(data.email),
-                "message" to JsonPrimitive(data.message),
-                "paymentsJson" to JsonArray(
-                    content = data.purchasesJson.map { JsonPrimitive(it) }
-                )
-            )
-        )
+    // These legacy services have no replacement implementation. Never send
+    // feedback, purchases, or study text to the previous operator.
+    private fun <T> unavailable(): Result<T> = Result.failure(HttpResponseException(
+        HttpStatusCode.NotImplemented,
+        "This feature is not available on the new Kanji Jojo service yet."
+    ))
+    override suspend fun postFeedback(data: FeedbackApiData): Result<Unit> = unavailable()
+    override suspend fun postDonationPurchase(data: DonationPurchaseApiData): Result<Unit> = unavailable()
+    override suspend fun getDonations(): Result<List<ApiDonation>> = unavailable()
+    override suspend fun postSubscription(purchaseJson: String): Result<Unit> = unavailable()
+    override suspend fun postTextAnalysisRequest(request: ApiTextAnalysisRequest): Result<SubscriptionResponse<ApiTextAnalysisResponse>> = unavailable()
 
-        networkClients.unauthenticatedClient.post(SPONSOR_URL) {
-            contentType(ContentType.Application.Json)
-            setBody(requestBody.toString())
+    private suspend fun checked(block: suspend () -> HttpResponse): HttpResponse {
+        val response = block()
+        if (response.status != HttpStatusCode.OK) {
+            val message = runCatching {
+                json.parseToJsonElement(response.bodyAsText()).jsonObject["message"]?.jsonPrimitive?.content
+            }.getOrNull() ?: "${response.status.value} ${response.status.description}"
+            throw HttpResponseException(response.status, message)
         }
+        return response
     }
-
-    override suspend fun getDonations(): Result<List<ApiDonation>> {
-        return safeRequest { networkClients.unauthenticatedClient.get(DONATIONS_URL) }
-            .mapCatching { json.decodeFromString(it.bodyAsText()) }
-    }
-
-    override suspend fun postSubscription(purchaseJson: String): Result<Unit> = safeRequestUnit {
-        networkClients.authenticatedClient.post(SUBSCRIPTION_URL) {
-            contentType(ContentType.Application.Json)
-            setBody(purchaseJson)
-        }
-    }
-
-    override suspend fun postTextAnalysisRequest(
-        request: ApiTextAnalysisRequest
-    ): Result<SubscriptionResponse<ApiTextAnalysisResponse>> = safeSubscriptionRequest(
-        request = {
-            networkClients.authenticatedClient.post(TEXT_ANALYSIS_URL) {
-                contentType(ContentType.Application.Json)
-                setBody(json.encodeToString(request))
-            }
-        },
-        responseMapper = { json.decodeFromString(it.bodyAsText()) }
-    )
-
-    private suspend fun safeRequest(
-        block: suspend () -> HttpResponse
-    ): Result<HttpResponse> {
-        return runCatching {
-            val response = block()
-            if (response.status != HttpStatusCode.OK) {
-                val message = response.bodyAsText()
-                    .takeIf { it.isNotEmpty() }
-                    ?: response.status.run { "$value $description" }
-                Logger.d("Network request failed, status[${response.status}], message[$message]")
-                throw HttpResponseException(
-                    statusCode = response.status,
-                    message = message
-                )
-            }
-            response
-        }
-    }
-
-    private suspend fun safeRequestUnit(
-        block: suspend () -> HttpResponse
-    ): Result<Unit> {
-        return safeRequest(block).mapCatching {}
-    }
-
-    private suspend fun <T> safeSubscriptionRequest(
-        request: suspend () -> HttpResponse,
-        responseMapper: suspend (HttpResponse) -> T
-    ): Result<SubscriptionResponse<T>> {
-        return safeRequest(request).mapCatching {
-            SubscriptionResponse(
-                value = responseMapper(it),
-                alert = it.headers[SUBSCRIPTION_ALERT_HTTP_HEADER_NAME]
-            )
-        }
-    }
-
-    private companion object {
-
-        const val BASE = "https://kanji-dojo.com/api/v2"
-
-        const val GET_USER_INFO_URL = "$BASE/user/info"
-        const val GET_USER_ID_URL = "$BASE/user/id"
-        const val GET_SYNC_INFO_URL = "$BASE/sync/info"
-        const val GET_SYNC_URL = "$BASE/sync/get"
-        const val UPDATE_SYNC_URL = "$BASE/sync/update"
-        const val FEEDBACK_URL = "$BASE/feedback"
-        const val SPONSOR_URL = "$BASE/sponsor"
-        const val DONATIONS_URL = "$BASE/donations"
-        const val SUBSCRIPTION_URL = "$BASE/play-billing-subscription"
-        const val TEXT_ANALYSIS_URL = "$BASE/text-analysis"
-
-        const val SUBSCRIPTION_ALERT_HTTP_HEADER_NAME = "X-Subscription-Alert"
-
-    }
-
 }

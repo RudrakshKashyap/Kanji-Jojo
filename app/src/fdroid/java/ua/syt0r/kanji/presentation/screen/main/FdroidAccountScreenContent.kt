@@ -34,14 +34,11 @@ object FdroidAccountScreenContent : AccountScreenContract.Content {
         val viewModel = getMultiplatformViewModel<FdroidAccountScreenContract.ViewModel>()
         val uriHandler = LocalUriHandler.current
 
-        LaunchedEffect(Unit) {
-            if (data != null) viewModel.signIn(data)
-        }
 
         FdroidAccountScreenUI(
             state = viewModel.state.collectAsState(),
             onUpClick = { state.navigateBack() },
-            onSignInClick = { uriHandler.openUri(AccountScreenContract.DEEP_LINK_AUTH_URL) },
+            onSignInClick = { viewModel.startSignIn(uriHandler::openUri) },
             onSignOutClick = { viewModel.signOut() },
             refresh = { viewModel.refresh() }
         )
@@ -54,7 +51,7 @@ interface FdroidAccountScreenContract {
 
     interface ViewModel {
         val state: StateFlow<ScreenState>
-        fun signIn(data: AccountScreenContract.ScreenData)
+        fun startSignIn(openBrowser: (String) -> Unit)
         fun signOut()
         fun refresh()
     }
@@ -151,8 +148,8 @@ class FdroidAccountScreenViewModel(
 
     }
 
-    override fun signIn(data: AccountScreenContract.ScreenData) {
-        accountManager.signIn(data.refreshToken, data.idToken)
+    override fun startSignIn(openBrowser: (String) -> Unit) {
+        accountManager.signInWithBrowser(openBrowser)
     }
 
     override fun signOut() {

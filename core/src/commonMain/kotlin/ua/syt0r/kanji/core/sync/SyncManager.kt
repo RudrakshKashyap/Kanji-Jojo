@@ -129,7 +129,8 @@ private class SyncEnabledState(
     }
 
     override fun resolveConflict(strategy: SyncConflictResolveStrategy) {
-        handleIntent(SyncIntent.ResolveConflict(strategy))
+        val conflict = _state.value as? SyncState.Conflict ?: return
+        handleIntent(SyncIntent.ResolveConflict(strategy, conflict.remoteRevision))
     }
 
     override fun cancel() {

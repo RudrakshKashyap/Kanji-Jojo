@@ -50,6 +50,7 @@ sealed interface SyncState {
     object Canceled : SyncState
 
     data class Conflict(
+        val remoteRevision: Long,
         val diffType: SyncDataDiffType,
         val remoteDataInfo: PreferencesSyncDataInfo,
         val localDataInfo: PreferencesSyncDataInfo,
@@ -65,7 +66,7 @@ sealed interface SyncState {
 sealed interface SyncIntent {
     object Refresh : SyncIntent
     object Sync : SyncIntent
-    data class ResolveConflict(val strategy: SyncConflictResolveStrategy) : SyncIntent
+    data class ResolveConflict(val strategy: SyncConflictResolveStrategy, val remoteRevision: Long) : SyncIntent
     object Cancel : SyncIntent
 }
 

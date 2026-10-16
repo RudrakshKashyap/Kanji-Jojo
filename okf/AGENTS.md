@@ -50,9 +50,10 @@ history alone does not convey.
 
 **Fork context:** The original Kanji-Dojo project was archived by its creator
 (Yaroslav Shuliak). Kanji-Jojo is a community continuation under the same GNU
-GPL v3.0 license. So far, only branding changes have been made (logo, package
-name `com.rudraksh.kanjijojo`). The codebase is inherited as-is and carries the
-original `ua.syt0r.kanji` internal package naming in many places.
+GPL v3.0 license. Branding uses package `com.rudraksh.kanjijojo`; account and sync
+sources now target the maintainer's owned service (see
+[/features/accounts-and-sync.md](/features/accounts-and-sync.md)). Much of the
+codebase still carries the original `ua.syt0r.kanji` internal package naming.
 
 It is **not** a mirror of the source tree. Do not document individual files or
 paste code that the repo already holds. Document intent, structure, decisions,

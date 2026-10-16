@@ -23,6 +23,7 @@ sealed interface SyncStateRefreshResult {
     ) : SyncStateRefreshResult
 
     data class WithRemoteData(
+        val remoteRevision: Long,
         val diffType: SyncDataDiffType,
         val localDataInfo: PreferencesSyncDataInfo,
         val cachedDataInfo: PreferencesSyncDataInfo?,
@@ -88,6 +89,7 @@ class DefaultRefreshSyncStateUseCase(
             }
 
             SyncStateRefreshResult.WithRemoteData(
+                remoteRevision = remoteApiSyncDataInfo.revision,
                 diffType = diffType,
                 localDataInfo = localSyncDataInfo,
                 cachedDataInfo = cachedRemoteSyncDataInfo,

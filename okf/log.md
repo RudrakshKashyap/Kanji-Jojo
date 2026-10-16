@@ -2,6 +2,21 @@
 
 Bundle-wide and cross-cutting changes. Newest first.
 
+## 2026-10-16
+
+- Corrected debug APK signing to use the Android debug key even when a release
+  keystore exists, so local builds do not require release signing credentials.
+- Migrated active website/account/sync requests to the owned Kanji Jojo origin
+  and Firebase project. Added browser approval with a private PKCE verifier,
+  one-time HTTPS token exchange, and polling across Android/iOS/Desktop. Removed
+  credential-bearing redirects and the desktop callback server.
+- Moved credentials/account/sync caches to new preference keys, preserving local
+  study data. Replaced legacy framed downloads with bounded, verified ZIP
+  snapshots and carried observed revisions through automatic/manual sync.
+- Disabled calls to unimplemented legacy purchases, feedback, donation history,
+  and text analysis; hid purchase offers and subscription status. Added JVM
+  protocol tests and documented backend deployment and platform validation needs.
+
 ## 2026-10-15
 
 - **Initialization**: Established the OKF bundle for the Kanji-Jojo project (a community

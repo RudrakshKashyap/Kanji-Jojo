@@ -10,7 +10,7 @@ interface GooglePlayAccountScreenContract {
 
     interface ViewModel {
         val state: StateFlow<ScreenState>
-        fun signIn(data: AccountScreenContract.ScreenData)
+        fun startSignIn(openBrowser: (String) -> Unit)
         fun signOut()
         fun refresh()
     }

@@ -9,7 +9,9 @@ import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 import io.ktor.client.plugins.auth.providers.bearer
-import io.ktor.client.request.post
+import io.ktor.client.request.forms.submitForm
+import io.ktor.http.parameters
+import io.ktor.http.HttpStatusCode
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineScope
@@ -64,6 +66,7 @@ class DefaultNetworkClients(
     override val authenticatedClient: HttpClient = HttpClient(engineFactory) {
         install(Auth) {
             bearer {
+                sendWithoutRequest { it.url.host == "kanji-jojo.com" && it.url.protocol.name == "https" }
                 loadTokens(::loadInitialTokens)
                 refreshTokens(::tokenRefreshHandler)
             }
@@ -95,28 +98,29 @@ class DefaultNetworkClients(
         }
 
         val newTokens = runCatching {
-            val response = unauthenticatedClient.post(TOKEN_REFRESH_URL) {
-                val payload = buildJsonObject {
-                    put("grant_type", "refresh_token")
-                    put("refresh_token", refreshToken)
+            val response = unauthenticatedClient.submitForm(
+                url = TOKEN_REFRESH_URL,
+                formParameters = parameters {
+                    append("grant_type", "refresh_token")
+                    append("refresh_token", refreshToken)
                 }
-                val payloadJson = Json.encodeToString(payload)
-                Logger.d("payload[$payloadJson]")
-                setBody(payloadJson)
-            }
+            )
+            check(response.status == HttpStatusCode.OK) { "Session refresh failed. Sign in again." }
 
             Logger.d("response status[${response.status}]")
             val body = Json.decodeFromString<JsonObject>(response.bodyAsText())
             val idToken = body["id_token"]!!.jsonPrimitive.content
             Logger.d("Received new id token")
 
+            val rotatedRefreshToken = body["refresh_token"]?.jsonPrimitive?.content ?: refreshToken
+            appPreferences.refreshToken.set(rotatedRefreshToken)
             appPreferences.idToken.set(idToken)
             BearerTokens(
                 accessToken = idToken,
-                refreshToken = refreshToken
+                refreshToken = rotatedRefreshToken
             )
         }.getOrElse {
-            Logger.d("Id Token refreshing error [$it]")
+            Logger.d("Session refresh failed")
             null
         }
 
@@ -124,7 +128,7 @@ class DefaultNetworkClients(
     }
 
     private companion object {
-        const val PROJECT_KEY = "AIzaSyCP9IzlOBkf9C6VHXBsD7xJr88R-ZOUKsA"
+        const val PROJECT_KEY = JojoService.firebaseApiKey
         const val TOKEN_REFRESH_URL = "https://securetoken.googleapis.com/v1/token?key=$PROJECT_KEY"
     }
 

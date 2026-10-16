@@ -23,7 +23,7 @@ open class KanjiDojoActivity : AppCompatActivity() {
         enableEdgeToEdge()
         themeManager.invalidate()
 
-        Logger.d("intentData[${intent.dataString}]")
+        Logger.d("Checking app return intent")
         intent.dataString?.let { deepLinkHandler.notifyDeepLink(it) }
 
         setContent {
@@ -36,7 +36,7 @@ open class KanjiDojoActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Logger.d("intentData[${intent.dataString}]")
+        Logger.d("Checking app return intent")
         intent.dataString?.let { deepLinkHandler.notifyDeepLink(it) }
     }
 

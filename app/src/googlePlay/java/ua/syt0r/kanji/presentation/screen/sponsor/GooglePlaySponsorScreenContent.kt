@@ -1,6 +1,7 @@
 package ua.syt0r.kanji.presentation.screen.sponsor
 
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
@@ -8,6 +9,7 @@ import ua.syt0r.kanji.presentation.common.asActivity
 import ua.syt0r.kanji.presentation.getMultiplatformViewModel
 import ua.syt0r.kanji.presentation.screen.main.MainNavigationState
 import ua.syt0r.kanji.presentation.screen.main.screen.sponsor.SponsorScreenContract
+import ua.syt0r.kanji.presentation.screen.main.screen.sponsor.SponsorScreenUI
 
 object GooglePlaySponsorScreenContent : SponsorScreenContract.Content {
 
@@ -16,20 +18,9 @@ object GooglePlaySponsorScreenContent : SponsorScreenContract.Content {
         state: MainNavigationState
     ) {
 
-        val viewModel: GooglePlaySponsorScreenContract.ViewModel = getMultiplatformViewModel()
-        val activity = LocalContext.current.asActivity()!!
-
-        LaunchedEffect(Unit) {
-            viewModel.reportScreenShown()
+        SponsorScreenUI(onUpClick = { state.navigateBack() }) {
+            Text("In-app purchases are not available on the new Kanji Jojo service yet.")
         }
-
-        GooglePlaySponsorScreenUI(
-            state = viewModel.state.collectAsState(),
-            onUpClick = { state.navigateBack() },
-            fillDetails = { viewModel.loadInputState() },
-            startPurchase = { viewModel.startPurchase(activity, it) },
-            retry = { viewModel.retry(activity) }
-        )
 
     }
 

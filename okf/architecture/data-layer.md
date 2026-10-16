@@ -65,3 +65,8 @@ core/
   file operations).
 - **Sync:** The `sync` package uses Ktor HTTP client for cloud synchronization.
   Authentication is handled via `ktor-client-auth`.
+
+Owned-service sync is a private versioned ZIP snapshot protocol with explicit
+revision preconditions and checksum checks. Auth/cache preferences use new
+`jojo_v1_*` keys so legacy credentials are not reused. Local study data remains
+unchanged. See [accounts and sync](/features/accounts-and-sync.md).

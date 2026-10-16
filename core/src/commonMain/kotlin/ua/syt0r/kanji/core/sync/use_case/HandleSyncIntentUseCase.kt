@@ -59,7 +59,7 @@ class DefaultHandleSyncIntentUseCase(
                 val shouldUpload = isNoRemoteData || isRemoteDataNewer
 
                 if (shouldUpload) {
-                    handleUpload(coroutineScope)
+                    handleUpload(coroutineScope, (refreshResult as? SyncStateRefreshResult.WithRemoteData)?.remoteRevision ?: 0)
                     return@flow
                 }
 
@@ -72,7 +72,7 @@ class DefaultHandleSyncIntentUseCase(
                     refreshResult is SyncStateRefreshResult.WithRemoteData &&
                     refreshResult.diffType == SyncDataDiffType.RemoteNewer
                 ) {
-                    handleDownload(coroutineScope)
+                    handleDownload(coroutineScope, refreshResult.remoteRevision)
                     return@flow
                 }
 
@@ -86,11 +86,11 @@ class DefaultHandleSyncIntentUseCase(
                 Logger.d("Handling resolve conflict intent")
                 when (intent.strategy) {
                     SyncConflictResolveStrategy.UploadLocal -> {
-                        handleUpload(coroutineScope)
+                        handleUpload(coroutineScope, intent.remoteRevision)
                     }
 
                     SyncConflictResolveStrategy.DownloadRemote -> {
-                        handleDownload(coroutineScope)
+                        handleDownload(coroutineScope, intent.remoteRevision)
                     }
                 }
             }
@@ -99,11 +99,11 @@ class DefaultHandleSyncIntentUseCase(
 
     }
 
-    private suspend fun FlowCollector<SyncState>.handleUpload(coroutineScope: CoroutineScope) {
+    private suspend fun FlowCollector<SyncState>.handleUpload(coroutineScope: CoroutineScope, baseRevision: Long) {
         Logger.logMethod()
         emit(SyncState.Uploading)
 
-        val uploadResult = uploadSyncDataUseCase()
+        val uploadResult = uploadSyncDataUseCase(baseRevision)
         Logger.d("uploadResult[$uploadResult]")
 
         val updatedSyncState = when (uploadResult) {
@@ -114,11 +114,11 @@ class DefaultHandleSyncIntentUseCase(
         emit(updatedSyncState)
     }
 
-    private suspend fun FlowCollector<SyncState>.handleDownload(coroutineScope: CoroutineScope) {
+    private suspend fun FlowCollector<SyncState>.handleDownload(coroutineScope: CoroutineScope, revision: Long) {
         Logger.logMethod()
         emit(SyncState.Downloading)
 
-        val applySyncResult = applyRemoteSyncDataUseCase()
+        val applySyncResult = applyRemoteSyncDataUseCase(revision)
         Logger.d("applySyncResult[$applySyncResult]")
 
         val updatedSyncState = when (applySyncResult) {
@@ -155,6 +155,7 @@ class DefaultHandleSyncIntentUseCase(
         }?.run {
             this as SyncStateRefreshResult.WithRemoteData
             SyncState.Conflict(
+                remoteRevision = remoteRevision,
                 diffType = diffType,
                 remoteDataInfo = remoteDataInfo,
                 localDataInfo = localDataInfo,

@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.module.Module
@@ -19,6 +23,7 @@ interface AccountManager {
     val subscriptionExpirationEvents: SharedFlow<Unit>
     val state: StateFlow<AccountState>
     fun signIn(refreshToken: String, idToken: String)
+    fun signInWithBrowser(openBrowser: (String) -> Unit, desktop: Boolean = false)
     fun signOut()
     fun refreshUserData()
     fun invalidateAuth()
@@ -56,6 +61,7 @@ fun Module.addAccountDefinitions() {
             coroutineScope = CoroutineScope(Dispatchers.IO),
             appPreferences = get(),
             networkApi = get(),
+            browserAccountAuth = BrowserAccountAuth(get()),
             timeUtils = get()
         )
     }
@@ -66,6 +72,7 @@ class DefaultAccountManager(
     private val coroutineScope: CoroutineScope,
     private val appPreferences: PreferencesContract.AppPreferences,
     private val networkApi: NetworkApi,
+    private val browserAccountAuth: BrowserAccountAuth,
     private val timeUtils: TimeUtils
 ) : AccountManager {
 
@@ -74,6 +81,7 @@ class DefaultAccountManager(
 
     private val _state = MutableStateFlow<AccountState>(AccountState.Loading)
     override val state: StateFlow<AccountState> = _state
+    private var signInJob: Job? = null
 
     init {
         _state.launchWhenHasSubscribers(coroutineScope) { updateStateFromLocal() }
@@ -84,11 +92,37 @@ class DefaultAccountManager(
         coroutineScope.launch {
             appPreferences.refreshToken.set(refreshToken)
             appPreferences.idToken.set(idToken)
+            appPreferences.lastSyncedDataInfo.set(null)
             updateStateFromRemote()
         }
     }
 
+    override fun signInWithBrowser(openBrowser: (String) -> Unit, desktop: Boolean) {
+        signInJob?.cancel()
+        _state.value = AccountState.Loading
+        signInJob = coroutineScope.launch {
+            try {
+                val tokens = browserAccountAuth.signIn(desktop) { url ->
+                    withContext(Dispatchers.Main) { openBrowser(url) }
+                }
+                appPreferences.refreshToken.set(tokens.refreshToken)
+                appPreferences.idToken.set(tokens.idToken)
+                appPreferences.lastSyncedDataInfo.set(null)
+                updateStateFromRemote()
+            } catch (error: TimeoutCancellationException) {
+                _state.value = AccountState.Error(ApiRequestIssue.Other(
+                    IllegalStateException("App sign-in timed out. Please start again.")
+                ))
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Throwable) {
+                _state.value = AccountState.Error(ApiRequestIssue.classify(error))
+            }
+        }
+    }
+
     override fun signOut() {
+        signInJob?.cancel()
         _state.value = AccountState.LoggedOut
         coroutineScope.launch { clearUserData() }
     }

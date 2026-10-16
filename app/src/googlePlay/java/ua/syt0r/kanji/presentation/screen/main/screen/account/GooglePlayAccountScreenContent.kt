@@ -59,14 +59,11 @@ object GooglePlayAccountScreenContent : AccountScreenContract.Content {
         val viewModel = getMultiplatformViewModel<GooglePlayAccountScreenContract.ViewModel>()
         val uriHandler = LocalUriHandler.current
 
-        LaunchedEffect(Unit) {
-            if (data != null) viewModel.signIn(data)
-        }
 
         GooglePlayAccountScreenUI(
             state = viewModel.state.collectAsState(),
             onUpClick = { state.navigateBack() },
-            onSignInClick = { uriHandler.openUri(AccountScreenContract.DEEP_LINK_AUTH_URL) },
+            onSignInClick = { viewModel.startSignIn(uriHandler::openUri) },
             onSignOutClick = { viewModel.signOut() },
             refresh = { viewModel.refresh() }
         )
@@ -294,7 +291,7 @@ private fun ColumnScope.SubscriptionOffersContent(
         text = buildAnnotatedString {
             withLink(
                 LinkAnnotation.Url(
-                    url = "https://kanji-dojo.com/terms",
+                    url = "https://kanji-jojo.com/privacy",
                     styles = TextLinkStyles(SpanStyle(textDecoration = TextDecoration.Underline))
                 )
             ) {
