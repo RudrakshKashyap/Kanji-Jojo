@@ -2,7 +2,7 @@ package ua.syt0r.kanji.core.user_data.database
 
 const val CharacterNoteMaxLength = 500
 
-interface CharacterNoteRepository {
+interface CharacterNoteRepository : ObservableRepository {
     suspend fun get(character: String): String
     suspend fun save(character: String, note: String)
 }

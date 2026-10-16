@@ -27,7 +27,8 @@ val infoScreenModule = module {
             screenData = it.component2(),
             loadLetterStateUseCase = get(),
             loadVocabStateUseCase = get(),
-            analyticsManager = get()
+            analyticsManager = get(),
+            characterNoteRepository = get()
         )
     }
 

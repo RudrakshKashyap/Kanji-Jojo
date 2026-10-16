@@ -4,6 +4,18 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-16
 
+- Added personal notes to character info pages and replaced the practice input
+  with a shared notes card offering reading/editing layouts, reveal, and Done.
+  Shared note controllers observe repository changes across screens, preserve
+  pending drafts, and flush edits on focus loss or navigation. Outside presses
+  dismiss editor focus and the keyboard without consuming other controls' taps.
+  Verified `:app:assembleGooglePlayDebug`; visual/touch behavior still needs a
+  device check.
+- Made personal notes available behind a variants-style reveal control on the
+  question screen. Opening notes does not reveal the answer; visibility resets
+  for each attempt, and answer reveal still opens notes automatically. Kept the
+  notes field available with the software keyboard in both writing layouts.
+  Builds and tests remain deferred at the user's request.
 - Added editable personal notes after reveal in reading/writing practice, with
   a 500-code-point limit, autosave, retry, and a flush before advancing/finishing.
   Schema v13 stores notes per character across decks and includes them in the

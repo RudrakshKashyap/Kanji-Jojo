@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -56,6 +57,9 @@ import io.ktor.http.buildUrl
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ua.syt0r.kanji.Res
+import ua.syt0r.kanji.presentation.common.character_notes.NoteFocusDismissalBox
+import ua.syt0r.kanji.presentation.common.character_notes.CharacterNoteCard
+import ua.syt0r.kanji.presentation.common.character_notes.CharacterNoteState
 import ua.syt0r.kanji.core.app_data.Sentence
 import ua.syt0r.kanji.core.app_data.data.JapaneseWord
 import ua.syt0r.kanji.info_no_data_copy
@@ -85,91 +89,108 @@ fun InfoScreenUI(
     state: State<ScreenState>,
     onUpButtonClick: () -> Unit,
     onLetterClick: (String) -> Unit,
-    onWordClick: (JapaneseWord) -> Unit
+    onWordClick: (JapaneseWord) -> Unit,
+    note: CharacterNoteState? = null,
+    onNoteChange: (String) -> Unit = {},
+    onNoteRetry: () -> Unit = {},
+    onNoteEditingFinished: () -> Unit = {}
 ) {
 
-    ScreenLayout(
-        state = state,
-        toolbar = {
-            TopAppBar(
-                title = { Text(text = "") },
-                navigationIcon = {
-                    IconButton(onClick = onUpButtonClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+    NoteFocusDismissalBox {
+        ScreenLayout(
+            state = state,
+            toolbar = {
+                TopAppBar(
+                    title = { Text(text = "") },
+                    navigationIcon = {
+                        IconButton(onClick = onUpButtonClick) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    }
+                )
+            },
+            letter = { data, listState, listSpacerState ->
+                LetterInfoUI(
+                    letterData = data,
+                    listState = listState,
+                    listSpacerState = listSpacerState,
+                    onFuriganaClick = onLetterClick,
+                    onWordClick = onWordClick,
+                    notesContent = {
+                        if (note != null && note.character == data.character) {
+                            CharacterNoteCard(
+                                state = note,
+                                onNoteChange = onNoteChange,
+                                onRetry = onNoteRetry,
+                                onEditingFinished = onNoteEditingFinished,
+                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                            )
+                        }
+                    }
+                )
+            },
+            vocab = { data, listState, listSpacerState ->
+                VocabInfoUI(
+                    vocabData = data,
+                    listState = listState,
+                    listSpacerState = listSpacerState,
+                    onLetterClick = onLetterClick
+                )
+            },
+            noData = {
+
+                val searchTerm: String
+                val message: String
+
+                when (it) {
+                    is InfoScreenData.Letter -> {
+                        searchTerm = it.letter
+                        message = stringResource(Res.string.info_no_data_letter, it.letter)
+                    }
+
+                    is InfoScreenData.Vocab -> {
+                        searchTerm = it.kanjiReading ?: it.kanaReading ?: it.id!!.toString()
+                        message = stringResource(Res.string.info_no_data_vocab, searchTerm)
                     }
                 }
-            )
-        },
-        letter = { data, listState, listSpacerState ->
-            LetterInfoUI(
-                letterData = data,
-                listState = listState,
-                listSpacerState = listSpacerState,
-                onFuriganaClick = onLetterClick,
-                onWordClick = onWordClick
-            )
-        },
-        vocab = { data, listState, listSpacerState ->
-            VocabInfoUI(
-                vocabData = data,
-                listState = listState,
-                listSpacerState = listSpacerState,
-                onLetterClick = onLetterClick
-            )
-        },
-        noData = {
 
-            val searchTerm: String
-            val message: String
-
-            when (it) {
-                is InfoScreenData.Letter -> {
-                    searchTerm = it.letter
-                    message = stringResource(Res.string.info_no_data_letter, it.letter)
-                }
-
-                is InfoScreenData.Vocab -> {
-                    searchTerm = it.kanjiReading ?: it.kanaReading ?: it.id!!.toString()
-                    message = stringResource(Res.string.info_no_data_vocab, searchTerm)
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentWidth()
-                    .width(Dimens.ScreenWidth)
-                    .padding(Dimens.ContentPadding)
-            ) {
-
-                Text(
-                    text = message,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                val clipboardManager = LocalClipboardManager.current
-                Button(
-                    onClick = { clipboardManager.setText(AnnotatedString(searchTerm)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.neutralButtonColors()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentWidth()
+                        .width(Dimens.ScreenWidth)
+                        .padding(Dimens.ContentPadding)
                 ) {
-                    Text(text = stringResource(Res.string.info_no_data_copy))
+
+                    Text(
+                        text = message,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    val clipboardManager = LocalClipboardManager.current
+                    Button(
+                        onClick = { clipboardManager.setText(AnnotatedString(searchTerm)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.neutralButtonColors()
+                    ) {
+                        Text(text = stringResource(Res.string.info_no_data_copy))
+                    }
+
+                    val uriHandler = LocalUriHandler.current
+                    Button(
+                        onClick = {
+                            uriHandler.openUri(InfoScreenContract.getJishoSearchUrl(searchTerm))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.neutralButtonColors()
+                    ) {
+                        Text(text = stringResource(Res.string.info_no_data_jisho))
+                    }
                 }
 
-                val uriHandler = LocalUriHandler.current
-                Button(
-                    onClick = {
-                        uriHandler.openUri(InfoScreenContract.getJishoSearchUrl(searchTerm))
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.neutralButtonColors()
-                ) {
-                    Text(text = stringResource(Res.string.info_no_data_jisho))
-                }
             }
-
-        }
-    )
+        )
+    }
 
 }
 
@@ -195,6 +216,7 @@ private fun ScreenLayout(
     }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = { toolbar() },
         floatingActionButton = {
             AnimatedVisibility(

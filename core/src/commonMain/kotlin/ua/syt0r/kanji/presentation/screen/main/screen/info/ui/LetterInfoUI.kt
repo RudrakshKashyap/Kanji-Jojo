@@ -36,7 +36,8 @@ fun LetterInfoUI(
     listState: LazyListState,
     listSpacerState: ExtraListSpacerState,
     onFuriganaClick: (String) -> Unit,
-    onWordClick: (JapaneseWord) -> Unit
+    onWordClick: (JapaneseWord) -> Unit,
+    notesContent: @Composable () -> Unit = {}
 ) {
 
     var wordToAddToDeck by remember { mutableStateOf<JapaneseWord?>(null) }
@@ -73,6 +74,7 @@ fun LetterInfoUI(
                     data = letterData,
                 )
             }
+            item { notesContent() }
         }
 
 
@@ -84,6 +86,7 @@ fun LetterInfoUI(
                         data = letterData
                     )
                 }
+                item { notesContent() }
                 val radicalsData = letterData.radicalsSectionData
                 infoScreenExpandableSection(
                     headerText = "Radicals",

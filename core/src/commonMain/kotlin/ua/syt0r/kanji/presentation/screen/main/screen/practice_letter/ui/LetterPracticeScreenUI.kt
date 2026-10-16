@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import ua.syt0r.kanji.Res
+import ua.syt0r.kanji.presentation.common.character_notes.NoteFocusDismissalBox
 import ua.syt0r.kanji.core.app_data.data.JapaneseWord
 import ua.syt0r.kanji.core.japanese.CharacterClassification
 import ua.syt0r.kanji.core.japanese.KanaReading
@@ -64,6 +65,7 @@ import ua.syt0r.kanji.presentation.common.MultiplatformBackHandler
 import ua.syt0r.kanji.presentation.common.resolveString
 import ua.syt0r.kanji.presentation.common.resources.string.resolveString
 import ua.syt0r.kanji.presentation.common.ui.FancyLoading
+import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.CharacterWritingProgress
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeAnswer
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeConfigurationCharactersPreview
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeConfigurationContainer
@@ -79,7 +81,7 @@ import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeTo
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeToolbarState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.LetterPracticeScreenContract.ScreenState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeConfiguration
-import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeNoteState
+import ua.syt0r.kanji.presentation.common.character_notes.CharacterNoteState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeReviewState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeSummaryItem
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.WritingPracticeHintMode
@@ -100,7 +102,8 @@ fun LetterPracticeScreenUI(
     finishPractice: () -> Unit,
     onPracticeCompleted: () -> Unit,
     onNoteChange: (String, String) -> Unit,
-    onNoteRetry: (String) -> Unit
+    onNoteRetry: (String) -> Unit,
+    onNoteEditingFinished: () -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -129,49 +132,52 @@ fun LetterPracticeScreenUI(
         MultiplatformBackHandler { showEarlyFinishDialog = true }
     }
 
-    ScreenLayout(
-        state = state,
-        toolbar = {
-            PracticeToolbar(
-                state = state.toToolbarState(),
-                onUpButtonClick = {
-                    if (shouldShowLeaveConfirmationOnBackClick.value) {
-                        showEarlyFinishDialog = true
-                    } else {
-                        navigateBack()
+    NoteFocusDismissalBox {
+        ScreenLayout(
+            state = state,
+            toolbar = {
+                PracticeToolbar(
+                    state = state.toToolbarState(),
+                    onUpButtonClick = {
+                        if (shouldShowLeaveConfirmationOnBackClick.value) {
+                            showEarlyFinishDialog = true
+                        } else {
+                            navigateBack()
+                        }
                     }
-                }
-            )
-        },
-        configuration = {
-            ConfiguringState(
-                state = it,
-                onConfigurationCompleted = onConfigured
-            )
-        },
-        review = {
-            ReviewState(
-                reviewState = it.reviewState,
-                note = it.note,
-                onNextClick = {
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                    onNextClick(it)
-                },
-                speakKana = speakKana,
-                onWordClick = onWordClick,
-                onNoteChange = onNoteChange,
-                onNoteRetry = onNoteRetry
-            )
-        },
-        summary = {
-            SummaryState(
-                screenState = it,
-                onItemClick = onSummaryItemCLick,
-                onFinishClick = onPracticeCompleted
-            )
-        }
-    )
+                )
+            },
+            configuration = {
+                ConfiguringState(
+                    state = it,
+                    onConfigurationCompleted = onConfigured
+                )
+            },
+            review = {
+                ReviewState(
+                    reviewState = it.reviewState,
+                    note = it.note,
+                    onNextClick = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onNextClick(it)
+                    },
+                    speakKana = speakKana,
+                    onWordClick = onWordClick,
+                    onNoteChange = onNoteChange,
+                    onNoteRetry = onNoteRetry,
+                    onNoteEditingFinished = onNoteEditingFinished
+                )
+            },
+            summary = {
+                SummaryState(
+                    screenState = it,
+                    onItemClick = onSummaryItemCLick,
+                    onFinishClick = onPracticeCompleted
+                )
+            }
+        )
+    }
 
 }
 
@@ -340,20 +346,35 @@ private fun ConfiguringState(
 @Composable
 private fun ReviewState(
     reviewState: LetterPracticeReviewState,
-    note: LetterPracticeNoteState,
+    note: CharacterNoteState,
     onNextClick: (PracticeAnswer) -> Unit,
     speakKana: (KanaReading) -> Unit,
     onWordClick: (JapaneseWord) -> Unit,
     onNoteChange: (String, String) -> Unit,
-    onNoteRetry: (String) -> Unit
+    onNoteRetry: (String) -> Unit,
+    onNoteEditingFinished: () -> Unit
 ) {
+
+    val answerRevealed = when (reviewState) {
+        is LetterPracticeReviewState.Reading -> reviewState.revealed.value
+        is LetterPracticeReviewState.Writing ->
+            reviewState.writerState.value.progress.value !is CharacterWritingProgress.Writing
+    }
+    val attemptKey = when (reviewState) {
+        is LetterPracticeReviewState.Reading -> reviewState
+        is LetterPracticeReviewState.Writing -> reviewState.writerState.value
+    }
+    var notesManuallyRevealed by remember(attemptKey) { mutableStateOf(false) }
 
     val notesContent: @Composable (String) -> Unit = { character ->
         if (note.character == character) {
             LetterPracticeNotes(
                 state = note,
+                revealed = answerRevealed || notesManuallyRevealed,
+                onReveal = { notesManuallyRevealed = true },
                 onNoteChange = { onNoteChange(character, it) },
-                onRetry = { onNoteRetry(character) }
+                onRetry = { onNoteRetry(character) },
+                onEditingFinished = onNoteEditingFinished
             )
         }
     }

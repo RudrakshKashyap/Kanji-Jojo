@@ -83,7 +83,7 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 | `deck_picker`     | Browse and select decks (JLPT, grade, custom)|
 | `feedback`        | Submit feedback                              |
 | `home`            | Main dashboard (decks, progress overview)    |
-| `info`            | Character detail view                        |
+| `info`            | Character detail view and personal notes     |
 | `practice_common` | Shared practice/review logic                 |
 | `practice_letter` | Letter reading/writing practice and personal notes |
 | `practice_vocab`  | Vocabulary review (flashcards, readings)     |
@@ -94,16 +94,29 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 
 ## Platform source sets
 
-Letter practice exposes an editable per-character note only after revealing a
-reading answer or completing a writing attempt, in portrait and landscape.
-The practice view model caches notes across repeated cards and decks, debounces
-autosave by 500 ms, and serializes writes. Advancing or finishing flushes pending
-edits; a failed save keeps the current practice screen and offers retry. Failed
-loads disable editing until retried, preventing an unseen saved note from being
-overwritten. Notes allow line breaks and up to 500 Unicode code points. During
-note entry with a software keyboard, the completed writing canvas is hidden to
-leave room for the field. Persistence and snapshot behavior are documented in
-[the data layer](/architecture/data-layer.md).
+Character info and letter practice share `CharacterNoteCard`, state, and a
+`CharacterNoteController` under `presentation/common/character_notes`. The card
+shows readable text with an edit action; editing exposes a multiline input,
+character counter, save status, and Done action. Character info places it below
+the character heading, before radicals/vocabulary. Practice shows a reveal
+control on the question screen; revealing notes does not reveal the answer.
+Answer reveal also opens notes, and manual visibility resets for each attempt.
+
+The shared controller caches notes across repeated cards/decks, debounces
+autosave by 500 ms, and serializes writes. Repository change notifications
+refresh clean notes in other open screens, including after database replacement;
+pending local drafts are preserved. Advancing/finishing practice and navigating
+away from character info flush pending edits; failed saves keep the screen and
+offer retry. Failed loads disable editing until retried. Notes allow line breaks
+and up to 500 Unicode code points.
+
+`NoteFocusDismissalBox` observes pointer-down events at the initial pass without
+consuming them, compares window coordinates with the focused editor bounds,
+and clears focus/hides the keyboard for outside presses. Child clicks and text
+selection retain their normal handling. Losing editor focus flushes pending
+changes and returns to the reading layout. During note entry with a software
+keyboard, the writing canvas is hidden to leave room for the field. Persistence
+and snapshot behavior are documented in [the data layer](/architecture/data-layer.md).
 
 Account and sync protocol ownership, browser approval, preference migration,
 and unsupported legacy services are documented in

@@ -86,8 +86,7 @@ fun LetterPracticeWritingUI(
     val infoSectionState = reviewState.asInfoSectionState(layoutConfiguration)
     val wordsBottomSheetState = reviewState.asWordsBottomSheetState()
     val density = LocalDensity.current
-    val editingWithKeyboard = infoSectionState.value.revealCharacter &&
-            WindowInsets.ime.getBottom(density) > 0
+    val editingWithKeyboard = WindowInsets.ime.getBottom(density) > 0
     val answersHeight = remember { mutableStateOf(0.dp) }
 
     val scaffoldState = rememberBottomSheetScaffoldState()
@@ -224,22 +223,18 @@ fun LetterPracticeWritingUI(
             )
         }
 
-        val (firstSection, secondSection) = when (layoutConfiguration.leftHandedMode) {
-            true -> inputSection to infoSection
-            false -> infoSection to inputSection
-        }
-
         Box {
 
             Row(
                 modifier = Modifier.fillMaxSize()
             ) {
 
-                if (editingWithKeyboard) {
-                    infoSection()
-                } else {
-                    firstSection()
-                    secondSection()
+                if (layoutConfiguration.leftHandedMode && !editingWithKeyboard) {
+                    inputSection()
+                }
+                infoSection()
+                if (!layoutConfiguration.leftHandedMode && !editingWithKeyboard) {
+                    inputSection()
                 }
 
             }

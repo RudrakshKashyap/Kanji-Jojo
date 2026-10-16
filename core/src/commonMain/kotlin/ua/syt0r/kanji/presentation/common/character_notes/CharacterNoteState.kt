@@ -1,10 +1,10 @@
-package ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data
+package ua.syt0r.kanji.presentation.common.character_notes
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class LetterPracticeNoteState(val character: String) {
+class CharacterNoteState(val character: String) {
     var text by mutableStateOf("")
         internal set
     var isLoaded by mutableStateOf(false)

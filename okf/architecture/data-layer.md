@@ -36,6 +36,10 @@ UI, with a matching SQLite length constraint; blank notes delete the row.
 update `localDataTimestamp`. Notes therefore participate in existing backup and
 snapshot sync without a separate endpoint. Whole-snapshot conflict handling
 applies to notes too; they are not merged independently between devices.
+The note repository also exposes the standard user-data change notifications
+for note writes and database replacement. Shared note controllers refresh clean
+local state from those notifications so edits on character info pages appear in
+an already-open practice screen without overwriting a pending draft.
 
 ### Platform drivers
 

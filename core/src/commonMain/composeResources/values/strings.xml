@@ -5,7 +5,10 @@
     <string name="practice_note_counter">%1$d / %2$d</string>
     <string name="practice_note_loading">Loading…</string>
     <string name="practice_note_saving">Saving…</string>
-    <string name="practice_note_saved">Saved on this device</string>
+    <string name="practice_note_saved">Saved</string>
+    <string name="practice_note_reveal">Reveal</string>
+    <string name="practice_note_edit">Edit note</string>
+    <string name="practice_note_done">Done</string>
     <string name="practice_note_load_error">Could not load your note</string>
     <string name="practice_note_save_error">Could not save your note</string>
     <string name="practice_note_retry">Retry</string>

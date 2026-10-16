@@ -177,10 +177,9 @@ fun LetterPracticeWritingInfoSection(
                 }
             }
 
-            // Use the live reveal state too: an outgoing animation must not expose
-            // notes while a new attempt is still waiting for its answer.
-            if (currentSectionData.revealCharacter && state.value.revealCharacter &&
-                currentSectionData.characterData.character == state.value.characterData.character
+            // Only the current attempt owns the notes control during transitions.
+            if (currentSectionData.characterData.character == state.value.characterData.character &&
+                currentSectionData.isStudyMode == state.value.isStudyMode
             ) {
                 notesContent(currentSectionData.characterData.character)
             }

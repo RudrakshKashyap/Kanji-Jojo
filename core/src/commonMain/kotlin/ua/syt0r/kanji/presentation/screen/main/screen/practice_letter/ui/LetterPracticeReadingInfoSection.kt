@@ -70,9 +70,7 @@ fun LetterPracticeReadingInfoSection(
 
         }
 
-        if (revealed.value) {
-            notesContent(state.itemData.character)
-        }
+        notesContent(state.itemData.character)
 
     }
 

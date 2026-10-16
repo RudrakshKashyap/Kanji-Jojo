@@ -5,7 +5,10 @@
     <string name="practice_note_counter">%1$d / %2$d</string>
     <string name="practice_note_loading">読み込み中…</string>
     <string name="practice_note_saving">保存中…</string>
-    <string name="practice_note_saved">この端末に保存済み</string>
+    <string name="practice_note_saved">保存済み</string>
+    <string name="practice_note_reveal">表示</string>
+    <string name="practice_note_edit">メモを編集</string>
+    <string name="practice_note_done">完了</string>
     <string name="practice_note_load_error">メモを読み込めませんでした</string>
     <string name="practice_note_save_error">メモを保存できませんでした</string>
     <string name="practice_note_retry">再試行</string>

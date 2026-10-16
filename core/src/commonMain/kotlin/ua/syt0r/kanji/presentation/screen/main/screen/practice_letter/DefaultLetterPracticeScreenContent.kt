@@ -46,6 +46,7 @@ object DefaultLetterPracticeScreenContent : LetterPracticeScreenContract.Content
             onPracticeCompleted = { mainNavigationState.navigateBack() },
             onNoteChange = { character, text -> viewModel.updateNote(character, text) },
             onNoteRetry = { viewModel.retryNote(it) },
+            onNoteEditingFinished = { viewModel.flushNotes() },
         )
 
     }

@@ -1,6 +1,7 @@
 package ua.syt0r.kanji.presentation.screen.main.screen.info
 
 import androidx.compose.runtime.State
+import ua.syt0r.kanji.presentation.common.character_notes.CharacterNoteState
 import io.ktor.http.URLProtocol
 import io.ktor.http.appendPathSegments
 import io.ktor.http.buildUrl
@@ -26,6 +27,11 @@ interface InfoScreenContract {
 
     interface ViewModel {
         val state: State<ScreenState>
+        val note: State<CharacterNoteState?>
+        fun updateNote(text: String)
+        fun retryNote()
+        fun flushNotes()
+        fun saveNotesAndThen(action: () -> Unit)
     }
 
     sealed interface ScreenState {
