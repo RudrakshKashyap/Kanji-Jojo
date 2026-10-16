@@ -1,0 +1,5 @@
+Kanji Jojo continues the archived Kanji Dojo project, with more improvements to come.
+- My notes: 500-character notes per character, shared across decks, in info pages and practice.
+- Reveal notes as a practice hint; autosave, backup, and sync included.
+- Kanji Jojo account sign-in and sync.
+Moving from Kanji Dojo? Export a backup there, restore it in Kanji Jojo, check your progress, then sync the imported local data. Old cloud backups do not move automatically.

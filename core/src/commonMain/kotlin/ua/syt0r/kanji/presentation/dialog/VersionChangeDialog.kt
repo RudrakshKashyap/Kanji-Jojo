@@ -49,6 +49,19 @@ fun VersionChangeDialog(
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth()
             ) {
+                version("3.0.0", LocalDate(2026, 10, 16)) {
+                    append(
+                        """
+                        - Kanji Jojo continues the archived Kanji Dojo project, with more improvements to come
+                        - Added My notes: up to 500 characters per kana or kanji, shared across decks
+                        - Read and edit notes on character info pages and during practice; reveal notes as a hint before answering
+                        - Notes autosave and are included in local backups and sync
+                        - Added Kanji Jojo's own account sign-in and sync service
+                        - Moving from Kanji Dojo? Create a backup there, restore it in Kanji Jojo, check your progress, then sign in and sync the imported local data
+                        - Old accounts and cloud backups do not move automatically; restoring replaces existing local study data
+                        """.trimIndent()
+                    )
+                }
                 version("2.2.1", LocalDate(2026, 2, 25)) {
                     append(
                         """

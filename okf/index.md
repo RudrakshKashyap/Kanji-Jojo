@@ -11,7 +11,7 @@ okf_version: "0.2"
 # Architecture
 
 - [Multiplatform overview](/architecture/multiplatform.md) - Kotlin Multiplatform structure, Gradle modules, and how the shared code maps to platform targets.
-- [Build system](/architecture/build-system.md) - Gradle configuration, product flavors (googlePlay/fdroid), signing, and CI/CD.
+- [Build system](/architecture/build-system.md) - Gradle configuration, 3.0.0 versions, signing, and tag-driven release notes/assets.
 - [Data layer](/architecture/data-layer.md) - SqlDelight databases, preferences, and schema v13 personal notes included in backup/snapshot sync.
 - [SRS engine](/architecture/srs.md) - the FSRS-based spaced repetition system, scheduling logic, and review parameters.
 

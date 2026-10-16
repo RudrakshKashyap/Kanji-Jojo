@@ -1,7 +1,22 @@
-Learn & practice writing Japanese characters
+Kanji Jojo is the community continuation of Kanji Dojo, the original app by Yaroslav Shuliak. Following the original project's archival, this independent open-source fork continues development under the GNU GPL v3.0 license, with new features and more improvements to come.
+
+Learn and practice writing Japanese characters
 
 Features
 - Study kana (both Hiragana and Katakana) and kanji
 - Practice by following JLPT levels or school grades
 - Create your own list to study, more than 6000 characters in total are available
 - Works offline
+- Write personal notes of up to 500 characters for each kana or kanji, shared across decks
+- Read and edit notes on character info pages and during practice
+- Reveal notes as a hint before answering, or read them after revealing the answer
+- Notes autosave and are included in local backups and sync
+
+Moving from Kanji Dojo
+1. In Kanji Dojo, open Settings > Backup & Restore > Create backup. Keep the exported ZIP outside the app.
+2. In Kanji Jojo, open Settings > Backup & Restore > Restore from backup and select the ZIP. Restoring replaces any existing Kanji Jojo study data; export it first if you need to keep it.
+3. Check your decks and review progress, then sign in from Kanji Jojo and sync the imported local data.
+
+Old accounts and cloud backups do not transfer automatically. Signing in on the website alone does not import or upload study data. Offline study and backup/restore do not require an account.
+
+Migration guide: https://kanji-jojo.com/migration

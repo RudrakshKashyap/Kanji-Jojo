@@ -2,8 +2,22 @@
 
 Bundle-wide and cross-cutting changes. Newest first.
 
+## 2026-10-17
+
+- Completed local 3.0.0 release-preparation verification after interruption.
+  `:app:assembleGooglePlayDebug` passed; APK metadata reports `3.0.0-debug` and
+  version code `3000`. Companion website lint/types/formatting and a webpack
+  production build passed, including the prerendered migration guide/sitemap.
+  Changes remain uncommitted for review; no tag, push, release, or deployment
+  was performed. Release signing and other platform packaging remain CI checks.
+
 ## 2026-10-16
 
+- Prepared 3.0.0 (Android code 3000, desktop 3.0.0, iOS source 3.0.0/build 12),
+  public continuation messaging, My notes release notes, Android metadata, and
+  export/import/verify/sync migration guidance. Tag-driven releases now include
+  their checked-in notes with write permission scoped to the publishing job.
+  Added a release procedure; no tag, push, or publication was performed.
 - Added personal notes to character info pages and replaced the practice input
   with a shared notes card offering reading/editing layouts, reveal, and Done.
   Shared note controllers observe repository changes across screens, preserve

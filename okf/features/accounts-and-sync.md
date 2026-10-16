@@ -65,6 +65,14 @@ Local/offline study and export remain available without an account.
 
 # Identity migration
 
+The public migration path is local export/import, followed by sync: in Kanji
+Dojo create a backup under Settings → Backup & Restore; restore that ZIP in
+Kanji Jojo, verify decks/progress, then sign in and sync the imported local data.
+Restore replaces the current local dataset rather than merging it. Old accounts
+and cloud archives do not transfer automatically. The app README, 3.0.0 release
+notes, and companion website `/migration` explain this sequence; website sign-in
+alone never imports/uploads the user's study data.
+
 Owned-service tokens, account cache, and last-sync cache use `jojo_v1_*`
 preference keys. Existing legacy credentials are not read or sent to the new
 service. Local database, study IDs, review progress, and settings are preserved.

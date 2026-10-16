@@ -1,8 +1,8 @@
 object AppVersion {
 
-    const val versionCode = 2220
+    const val versionCode = 3000
 
-    const val versionName = "2.2.2"
+    const val versionName = "3.0.0"
 
     // Requires 3 numbers
     const val desktopAppVersion = versionName

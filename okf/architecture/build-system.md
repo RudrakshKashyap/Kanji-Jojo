@@ -18,6 +18,11 @@ status: draft
 - **JVM toolchain:** 17
 - **Root project name:** `kanji-jojo`
 
+Release 3.0.0 uses `AppVersion.versionName = "3.0.0"` and Android version code
+`3000`; desktop packages use that same version name. Xcode keeps independent
+marketing/build values (`3.0.0` / `12`). See repo-root `RELEASING.md` for the
+release procedure and its platform-validation limits.
+
 ## Android product flavors
 
 The `:app` module has two product flavors on a `version` dimension:
@@ -57,7 +62,13 @@ The "Build All" workflow (`build-all.yml`) runs on `workflow_call` and
 | `build-desktop-windows`       | `windows-latest`  | Windows MSI installer                 |
 | `build-desktop-mac-intel`     | `macos-15-intel`  | macOS DMG (Intel)                     |
 
-A separate release workflow likely triggers on tag push (TODO: verify).
+`build-release.yml` triggers on pushed `v*.*` tags and calls `build-all.yml`.
+The reusable build also produces an Apple Silicon DMG on `macos-15`. After all
+builds pass, the release job checks out the tagged source and publishes the
+downloaded assets with `release-notes/<tag>.md` as its body. The workflow defaults
+to read-only contents access; only the publishing job gets `contents: write`.
+It does not publish to app stores or produce an iOS binary. Coordinated website
+deployment remains separate from this GitHub release workflow.
 
 ## Desktop packaging
 
