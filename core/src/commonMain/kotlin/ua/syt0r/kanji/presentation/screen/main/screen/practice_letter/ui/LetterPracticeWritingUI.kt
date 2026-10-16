@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
@@ -39,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -74,13 +77,18 @@ fun LetterPracticeWritingUI(
     reviewState: LetterPracticeReviewState.Writing,
     onNextClick: (PracticeAnswer) -> Unit,
     speakKana: (KanaReading) -> Unit,
-    onWordClick: (JapaneseWord) -> Unit
+    onWordClick: (JapaneseWord) -> Unit,
+    notesContent: @Composable (String) -> Unit = {}
 ) {
 
     val reviewState = rememberUpdatedState(reviewState)
 
     val infoSectionState = reviewState.asInfoSectionState(layoutConfiguration)
     val wordsBottomSheetState = reviewState.asWordsBottomSheetState()
+    val density = LocalDensity.current
+    val editingWithKeyboard = infoSectionState.value.revealCharacter &&
+            WindowInsets.ime.getBottom(density) > 0
+    val answersHeight = remember { mutableStateOf(0.dp) }
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -119,7 +127,9 @@ fun LetterPracticeWritingUI(
             letterWritingButtonsState = reviewState.toAnswerButtonsState(),
             studyCompleted = { reviewState.value.isStudyMode.value = false },
             answerSelected = onNextClick,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.BottomCenter).onGloballyPositioned {
+                answersHeight.value = with(density) { it.size.height.toDp() }
+            }
         )
     }
 
@@ -147,22 +157,25 @@ fun LetterPracticeWritingUI(
                 onExpressionsClick = openBottomSheet,
                 onExpressionSectionCoordinatesUpdate = onExpressionSectionCoordinatesUpdate,
                 speakKana = speakKana,
-                extraBottomPaddingState = infoSectionBottomPadding,
+                extraBottomPaddingState = if (editingWithKeyboard) answersHeight else infoSectionBottomPadding,
+                notesContent = notesContent,
                 modifier = Modifier.fillMaxSize(),
             )
 
-            LetterPracticeWritingInputSection(
-                state = reviewState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .trackItemPosition {
-                        infoSectionBottomPadding.value = it.heightFromScreenBottom
-                    }
-                    .sizeIn(maxWidth = 400.dp)
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp)
-                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            )
+            if (!editingWithKeyboard) {
+                LetterPracticeWritingInputSection(
+                    state = reviewState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .trackItemPosition {
+                            infoSectionBottomPadding.value = it.heightFromScreenBottom
+                        }
+                        .sizeIn(maxWidth = 400.dp)
+                        .padding(horizontal = 20.dp)
+                        .padding(bottom = 20.dp)
+                        .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                )
+            }
 
             answersSection()
 
@@ -191,6 +204,8 @@ fun LetterPracticeWritingUI(
                     onExpressionsClick = openBottomSheet,
                     onExpressionSectionCoordinatesUpdate = onExpressionSectionCoordinatesUpdate,
                     speakKana = speakKana,
+                    notesContent = notesContent,
+                    extraBottomPaddingState = answersHeight,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -220,9 +235,12 @@ fun LetterPracticeWritingUI(
                 modifier = Modifier.fillMaxSize()
             ) {
 
-                firstSection()
-
-                secondSection()
+                if (editingWithKeyboard) {
+                    infoSection()
+                } else {
+                    firstSection()
+                    secondSection()
+                }
 
             }
 

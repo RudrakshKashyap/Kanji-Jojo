@@ -7,6 +7,7 @@ import ua.syt0r.kanji.presentation.screen.main.MainNavigationState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeAnswer
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeQueueProgress
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeConfiguration
+import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeNoteState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeReviewState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeScreenConfiguration
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeSummaryItem
@@ -40,6 +41,8 @@ interface LetterPracticeScreenContract {
         fun submitAnswer(answer: PracticeAnswer)
         fun speakKana(reading: KanaReading)
         fun finishPractice()
+        fun updateNote(character: String, text: String)
+        fun retryNote(character: String)
 
     }
 
@@ -53,7 +56,8 @@ interface LetterPracticeScreenContract {
 
         data class Review(
             val practiceProgress: PracticeQueueProgress,
-            val reviewState: LetterPracticeReviewState
+            val reviewState: LetterPracticeReviewState,
+            val note: LetterPracticeNoteState
         ) : ScreenState
 
         data class Summary(

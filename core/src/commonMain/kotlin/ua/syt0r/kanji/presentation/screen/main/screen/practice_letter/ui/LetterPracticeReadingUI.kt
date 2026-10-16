@@ -54,7 +54,8 @@ fun LetterPracticeReadingUI(
     reviewState: LetterPracticeReviewState.Reading,
     onNextClick: (PracticeAnswer) -> Unit,
     speakKana: (KanaReading) -> Unit,
-    onWordClick: (JapaneseWord) -> Unit
+    onWordClick: (JapaneseWord) -> Unit,
+    notesContent: @Composable (String) -> Unit = {}
 ) {
 
     var wordToAddToVocabDeck by remember { mutableStateOf<JapaneseWord?>(null) }
@@ -93,7 +94,8 @@ fun LetterPracticeReadingUI(
                     LetterPracticeReadingInfoSection(
                         state = reviewState,
                         speakKana = speakKana,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                        notesContent = notesContent
                     )
                 }
                 addWordItems(
@@ -115,7 +117,8 @@ fun LetterPracticeReadingUI(
                     modifier = Modifier.weight(1f)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 20.dp)
-                        .padding(bottom = 20.dp)
+                        .padding(bottom = 20.dp),
+                    notesContent = notesContent
                 )
 
                 LazyColumn(

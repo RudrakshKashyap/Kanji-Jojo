@@ -1,5 +1,15 @@
 <resources>
 
+    <string name="practice_note_title">自分のメモ</string>
+    <string name="practice_note_placeholder">この文字のメモを入力…</string>
+    <string name="practice_note_counter">%1$d / %2$d</string>
+    <string name="practice_note_loading">読み込み中…</string>
+    <string name="practice_note_saving">保存中…</string>
+    <string name="practice_note_saved">この端末に保存済み</string>
+    <string name="practice_note_load_error">メモを読み込めませんでした</string>
+    <string name="practice_note_save_error">メモを保存できませんでした</string>
+    <string name="practice_note_retry">再試行</string>
+
     <string name="study_category_letter">文字</string>
     <string name="study_category_vocab">単語</string>
     <string name="practice_type_writing">書き取り</string>

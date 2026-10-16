@@ -1,6 +1,7 @@
 package ua.syt0r.kanji.core.user_data.database
 
 import org.koin.core.module.Module
+import ua.syt0r.kanji.core.user_data.database.sqldelight.SqlDelightCharacterNoteRepository
 import ua.syt0r.kanji.core.user_data.database.migration.UserDataDatabaseMigrationProvider
 import ua.syt0r.kanji.core.user_data.database.sqldelight.SqlDelightFsrsCardRepository
 import ua.syt0r.kanji.core.user_data.database.sqldelight.SqlDelightLetterPracticeRepository
@@ -11,6 +12,10 @@ import ua.syt0r.kanji.core.user_data.database.use_case.DefaultUpdateLocalDataTim
 import ua.syt0r.kanji.core.user_data.database.use_case.UpdateLocalDataTimestampUseCase
 
 fun Module.addUserDataDatabaseDefinitions() {
+
+    single<CharacterNoteRepository> {
+        SqlDelightCharacterNoteRepository(databaseManager = get())
+    }
 
     single<UserDataDatabaseContract.Manager> {
         DefaultUserDataDatabaseManager(

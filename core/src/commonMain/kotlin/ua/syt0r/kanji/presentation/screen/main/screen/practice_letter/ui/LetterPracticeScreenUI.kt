@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -43,6 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -76,6 +79,7 @@ import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeTo
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_common.PracticeToolbarState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.LetterPracticeScreenContract.ScreenState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeConfiguration
+import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeNoteState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeReviewState
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.LetterPracticeSummaryItem
 import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.WritingPracticeHintMode
@@ -94,8 +98,13 @@ fun LetterPracticeScreenUI(
     onWordClick: (JapaneseWord) -> Unit,
     onSummaryItemCLick: (LetterPracticeSummaryItem) -> Unit,
     finishPractice: () -> Unit,
-    onPracticeCompleted: () -> Unit
+    onPracticeCompleted: () -> Unit,
+    onNoteChange: (String, String) -> Unit,
+    onNoteRetry: (String) -> Unit
 ) {
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var showEarlyFinishDialog by rememberSaveable { mutableStateOf(false) }
     if (showEarlyFinishDialog) {
@@ -103,6 +112,8 @@ fun LetterPracticeScreenUI(
             onDismissRequest = { showEarlyFinishDialog = false },
             onConfirmClick = {
                 showEarlyFinishDialog = false
+                focusManager.clearFocus()
+                keyboardController?.hide()
                 finishPractice()
             }
         )
@@ -141,9 +152,16 @@ fun LetterPracticeScreenUI(
         review = {
             ReviewState(
                 reviewState = it.reviewState,
-                onNextClick = onNextClick,
+                note = it.note,
+                onNextClick = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    onNextClick(it)
+                },
                 speakKana = speakKana,
-                onWordClick = onWordClick
+                onWordClick = onWordClick,
+                onNoteChange = onNoteChange,
+                onNoteRetry = onNoteRetry
             )
         },
         summary = {
@@ -167,6 +185,7 @@ private fun ScreenLayout(
 ) {
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = { toolbar() }
     ) { paddingValues ->
 
@@ -321,10 +340,23 @@ private fun ConfiguringState(
 @Composable
 private fun ReviewState(
     reviewState: LetterPracticeReviewState,
+    note: LetterPracticeNoteState,
     onNextClick: (PracticeAnswer) -> Unit,
     speakKana: (KanaReading) -> Unit,
-    onWordClick: (JapaneseWord) -> Unit
+    onWordClick: (JapaneseWord) -> Unit,
+    onNoteChange: (String, String) -> Unit,
+    onNoteRetry: (String) -> Unit
 ) {
+
+    val notesContent: @Composable (String) -> Unit = { character ->
+        if (note.character == character) {
+            LetterPracticeNotes(
+                state = note,
+                onNoteChange = { onNoteChange(character, it) },
+                onRetry = { onNoteRetry(character) }
+            )
+        }
+    }
 
     when (reviewState) {
         is LetterPracticeReviewState.Writing -> LetterPracticeWritingUI(
@@ -332,14 +364,16 @@ private fun ReviewState(
             reviewState = reviewState,
             onNextClick = onNextClick,
             speakKana = speakKana,
-            onWordClick = onWordClick
+            onWordClick = onWordClick,
+            notesContent = notesContent
         )
 
         is LetterPracticeReviewState.Reading -> LetterPracticeReadingUI(
             reviewState = reviewState,
             onNextClick = onNextClick,
             speakKana = speakKana,
-            onWordClick = onWordClick
+            onWordClick = onWordClick,
+            notesContent = notesContent
         )
     }
 

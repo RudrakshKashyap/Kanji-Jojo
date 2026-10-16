@@ -116,6 +116,7 @@ fun LetterPracticeWritingInfoSection(
     speakKana: (KanaReading) -> Unit,
     extraBottomPaddingState: State<Dp> = rememberUpdatedState(0.dp),
     modifier: Modifier = Modifier,
+    notesContent: @Composable (String) -> Unit = {}
 ) {
 
     val transition = updateTransition(
@@ -174,6 +175,14 @@ fun LetterPracticeWritingInfoSection(
                         }
                     )
                 }
+            }
+
+            // Use the live reveal state too: an outgoing animation must not expose
+            // notes while a new attempt is still waiting for its answer.
+            if (currentSectionData.revealCharacter && state.value.revealCharacter &&
+                currentSectionData.characterData.character == state.value.characterData.character
+            ) {
+                notesContent(currentSectionData.characterData.character)
             }
 
             val examples = currentSectionData.characterData.examples

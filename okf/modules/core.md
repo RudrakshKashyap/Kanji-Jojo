@@ -85,7 +85,7 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 | `home`            | Main dashboard (decks, progress overview)    |
 | `info`            | Character detail view                        |
 | `practice_common` | Shared practice/review logic                 |
-| `practice_letter` | Letter writing practice (stroke input)       |
+| `practice_letter` | Letter reading/writing practice and personal notes |
 | `practice_vocab`  | Vocabulary review (flashcards, readings)     |
 | `sponsor`         | Donation / support                           |
 | `sync`            | Cloud sync UI                                |
@@ -93,6 +93,17 @@ Each screen has its own package under `presentation/screen/main/screen/`:
 | `vocab_card`      | Vocabulary card detail                       |
 
 ## Platform source sets
+
+Letter practice exposes an editable per-character note only after revealing a
+reading answer or completing a writing attempt, in portrait and landscape.
+The practice view model caches notes across repeated cards and decks, debounces
+autosave by 500 ms, and serializes writes. Advancing or finishing flushes pending
+edits; a failed save keeps the current practice screen and offers retry. Failed
+loads disable editing until retried, preventing an unseen saved note from being
+overwritten. Notes allow line breaks and up to 500 Unicode code points. During
+note entry with a software keyboard, the completed writing canvas is hidden to
+leave room for the field. Persistence and snapshot behavior are documented in
+[the data layer](/architecture/data-layer.md).
 
 Account and sync protocol ownership, browser approval, preference migration,
 and unsupported legacy services are documented in

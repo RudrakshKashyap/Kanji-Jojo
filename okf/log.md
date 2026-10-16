@@ -4,6 +4,11 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-16
 
+- Added editable personal notes after reveal in reading/writing practice, with
+  a 500-code-point limit, autosave, retry, and a flush before advancing/finishing.
+  Schema v13 stores notes per character across decks and includes them in the
+  existing backup/snapshot sync path. Updated core and data-layer knowledge.
+  Builds and tests were deferred at the user's request.
 - Isolated sync operation and tracker errors so later requests remain usable;
   settled interrupted results, removed dropped intents, and disabled overlapping
   sync taps. Added bounded network timeouts, transient app-sign-in polling

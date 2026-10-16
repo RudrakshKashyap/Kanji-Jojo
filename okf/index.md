@@ -12,14 +12,14 @@ okf_version: "0.2"
 
 - [Multiplatform overview](/architecture/multiplatform.md) - Kotlin Multiplatform structure, Gradle modules, and how the shared code maps to platform targets.
 - [Build system](/architecture/build-system.md) - Gradle configuration, product flavors (googlePlay/fdroid), signing, and CI/CD.
-- [Data layer](/architecture/data-layer.md) - SqlDelight databases (AppData, UserData), DataStore preferences, and how data flows through the app.
+- [Data layer](/architecture/data-layer.md) - SqlDelight databases, preferences, and schema v13 personal notes included in backup/snapshot sync.
 - [SRS engine](/architecture/srs.md) - the FSRS-based spaced repetition system, scheduling logic, and review parameters.
 
 # Modules
 
 - [modules/](/modules/) - one concept per Gradle module.
 - [app (Android)](/modules/app.md) - the Android application shell (`com.rudraksh.kanjijojo`), flavors, and platform-specific wiring.
-- [core](/modules/core.md) - the shared KMP library: all business logic, UI (Compose Multiplatform), databases, and DI.
+- [core](/modules/core.md) - the shared KMP library: business logic, Compose UI, databases, DI, and autosaved practice notes.
 - [desktopApp](/modules/desktop-app.md) - the JVM/Desktop entry point.
 - [iosApp](/modules/ios-app.md) - the iOS entry point (Swift/Xcode wrapper).
 - [mediaGenerator](/modules/media-generator.md) - asset generation tooling.

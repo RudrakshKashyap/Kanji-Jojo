@@ -26,6 +26,17 @@ BuildKonfig's `appDataAssetName`). It is read-only at runtime.
 **UserData** is created/migrated on device. Migrations live in
 `sqldelight_user_data/migrations/`.
 
+Schema version 13 adds `character_note`, keyed by character rather than deck or
+practice type. Its optional plain-text note is shared by reading/writing practice
+and every deck containing that character. Migration `12.sqm` preserves existing
+study data. Notes are limited to 500 Unicode code points in the repository and
+UI, with a matching SQLite length constraint; blank notes delete the row.
+
+`CharacterNoteRepository` uses the database manager's write transactions, which
+update `localDataTimestamp`. Notes therefore participate in existing backup and
+snapshot sync without a separate endpoint. Whole-snapshot conflict handling
+applies to notes too; they are not merged independently between devices.
+
 ### Platform drivers
 
 | Platform | Driver                        |

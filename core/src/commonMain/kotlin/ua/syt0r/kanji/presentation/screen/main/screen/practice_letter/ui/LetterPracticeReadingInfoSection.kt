@@ -27,7 +27,8 @@ import ua.syt0r.kanji.presentation.screen.main.screen.practice_letter.data.Lette
 fun LetterPracticeReadingInfoSection(
     state: LetterPracticeReviewState.Reading,
     speakKana: (KanaReading) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    notesContent: @Composable (String) -> Unit = {}
 ) {
 
     val revealed = rememberUpdatedState(state.revealed.value)
@@ -67,6 +68,10 @@ fun LetterPracticeReadingInfoSection(
                 )
             }
 
+        }
+
+        if (revealed.value) {
+            notesContent(state.itemData.character)
         }
 
     }

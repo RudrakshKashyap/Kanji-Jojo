@@ -1,7 +1,23 @@
-PRAGMA user_version = 12;
+PRAGMA user_version = 13;
 
 getLastInsertRowId:
 SELECT last_insert_rowid();
+
+------- CHARACTER NOTES -------
+
+CREATE TABLE character_note (
+    character TEXT NOT NULL PRIMARY KEY,
+    note TEXT NOT NULL CHECK (length(note) <= 500)
+);
+
+getCharacterNote:
+SELECT note FROM character_note WHERE character = ?;
+
+upsertCharacterNote:
+INSERT OR REPLACE INTO character_note(character, note) VALUES (?, ?);
+
+deleteCharacterNote:
+DELETE FROM character_note WHERE character = ?;
 
 ------- LETTER DECKS -------
 
