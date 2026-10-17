@@ -4,6 +4,11 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-17
 
+- Increased Android version code to 3001 at the maintainer's request so a new
+  Play bundle can include Billing 8 and advertising ID permission removal after
+  code 3000 was released to testing. Version name remains 3.0.0. Added matching
+  Android changelog metadata and refreshed the release guide/build knowledge.
+
 - Removed inherited Google Play advertising ID permissions (`AD_ID` and
   `ACCESS_ADSERVICES_AD_ID`) with manifest merger removal rules, retaining
   Firebase's disabled advertising ID collection flag. Release manifest

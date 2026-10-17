@@ -19,7 +19,8 @@ status: draft
 - **Root project name:** `kanji-jojo`
 
 Release 3.0.0 uses `AppVersion.versionName = "3.0.0"` and Android version code
-`3000`; desktop packages use that same version name. Xcode keeps independent
+`3001` (the initial Play upload used `3000`); desktop packages use that same
+version name. Xcode keeps independent
 marketing/build values (`3.0.0` / `12`). See repo-root `RELEASING.md` for the
 release procedure and its platform-validation limits.
 

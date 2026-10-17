@@ -2,11 +2,11 @@
 
 ## Prepared release: 3.0.0
 
-- Android: version name `3.0.0`, version code `3000`.
+- Android: version name `3.0.0`, version code `3001` (the initial Play upload used `3000`).
 - Desktop packages: version `3.0.0`, using the shared `AppVersion`.
 - iOS source: marketing version `3.0.0`, build number `12`. The GitHub workflow does not build or publish iOS.
 - GitHub release body: [release-notes/v3.0.0.md](release-notes/v3.0.0.md).
-- Android listing changelog: [3000.txt](fastlane/metadata/android/en-US/changelog/3000.txt).
+- Android listing changelog: [3001.txt](fastlane/metadata/android/en-US/changelog/3001.txt).
 
 ## Review before publishing
 

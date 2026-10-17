@@ -1,0 +1,2 @@
+- Updated Google Play Billing Library to 8.0.0.
+- Removed unused advertising ID permissions; advertising ID collection remains disabled.
