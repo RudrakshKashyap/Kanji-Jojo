@@ -44,3 +44,13 @@ See [Build system](/architecture/build-system.md) for details on the
 
 Depends on `:core` (the only module dependency). Flavor-specific dependencies:
 - `googlePlay`: Firebase BOM, Analytics, Crashlytics, Play Billing, In-App Review
+
+## Advertising ID
+
+The Google Play manifest disables Firebase advertising ID collection with
+`google_analytics_adid_collection_enabled=false`. Analytics dependencies still
+declare advertising ID permissions, so the flavor manifest removes both
+`com.google.android.gms.permission.AD_ID` and
+`android.permission.ACCESS_ADSERVICES_AD_ID` using `tools:node="remove"`.
+Check the merged release manifest when changing Analytics dependencies; the
+Play Console advertising ID declaration must match the uploaded bundle.

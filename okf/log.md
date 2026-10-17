@@ -4,6 +4,13 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-17
 
+- Removed inherited Google Play advertising ID permissions (`AD_ID` and
+  `ACCESS_ADSERVICES_AD_ID`) with manifest merger removal rules, retaining
+  Firebase's disabled advertising ID collection flag. Release manifest
+  processing passed; inspected the merged manifest to confirm both permissions
+  are absent, collection is disabled, and Android code remains 3000. A new
+  signed bundle must be generated before uploading this change to Play.
+
 - Upgraded the Google Play Billing dependency from 7.1.1 to 8.0.0 for Play
   upload compatibility. Kept version name 3.0.0 and Android code 3000 at the
   maintainer's request. Existing Kotlin billing wrappers remain in use;
