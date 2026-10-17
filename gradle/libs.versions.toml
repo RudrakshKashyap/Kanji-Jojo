@@ -24,7 +24,7 @@ datastore-preferences = "1.1.1"
 media3-exoplayer = "1.4.1"
 
 firebase = "33.7.0"
-billing = "7.1.1"
+billing = "8.0.0"
 review-ktx = "2.0.1"
 
 build-config = "5.4.0"

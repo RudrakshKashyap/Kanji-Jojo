@@ -35,6 +35,12 @@ The `:app` module has two product flavors on a `version` dimension:
 Debug builds additionally get `.dev` appended to the application ID and
 `-debug` to the version name.
 
+The Google Play flavor uses Play Billing Library `8.0.0`, configured in
+`gradle/libs.versions.toml`, to meet Play's minimum Billing 8 requirement.
+Billing calls use the KTX `queryProductDetails` wrapper and the parameterized
+`enablePendingPurchases` API. Purchase offers remain disabled where the owned
+backend has no billing support; the library upgrade does not enable payments.
+
 ## Signing
 
 The owned Google Play Firebase config must include the debug package

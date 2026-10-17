@@ -4,6 +4,15 @@ Bundle-wide and cross-cutting changes. Newest first.
 
 ## 2026-10-17
 
+- Upgraded the Google Play Billing dependency from 7.1.1 to 8.0.0 for Play
+  upload compatibility. Kept version name 3.0.0 and Android code 3000 at the
+  maintainer's request. Existing Kotlin billing wrappers remain in use;
+  this does not activate purchase offers or add a billing backend.
+  Google Play release Kotlin compilation and manifest processing passed;
+  dependency insight confirms billing and billing-ktx both resolve to 8.0.0.
+  No replacement signed bundle was generated; signing credentials were not
+  available in the shell.
+
 - Completed local 3.0.0 release-preparation verification after interruption.
   `:app:assembleGooglePlayDebug` passed; APK metadata reports `3.0.0-debug` and
   version code `3000`. Companion website lint/types/formatting and a webpack
